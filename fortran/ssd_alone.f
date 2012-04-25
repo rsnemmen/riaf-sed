@@ -48,18 +48,18 @@ c **********************************
 c UPDATE Mar 8th 2012
 c Still wondering about the 0.1 factor below
 c **********************************
-        read(*,*) dotm
-        dotm=0.1d0*dotm*dotme
-c        dotm=dotm*dotme
-c	dotm=6.4d-4*dotme !--------------3-----------------!
+      read(*,*) dotm
+c      dotm=0.1d0*dotm*dotme
+      dotm=dotm*dotme
+c	  dotm=6.4d-4*dotme !--------------3-----------------!
 	
-        read(*,*) rin
-        rin=rin*rs
+      read(*,*) rin
+      rin=rin*rs
 c	rin=225.d0*rs  !--------------4-----------------!
 c	rout=3.0d+4*rs  !--------------5-----------------!
 
-        read(*,*) theta
-	theta=theta/57.2958 !--------------6-----------------!
+      read(*,*) theta
+	  theta=theta/57.2958 !--------------6-----------------!
 c*********************************
 	do 10 i=1,50
 
@@ -91,30 +91,24 @@ c=====================================================================c
 	common dotm,h,k,mass,rs,solarmass,rin
 	double precision mass,nu,k,m8,msun
 
-c	dotm26=dotm/1.d+26*(1.-rin/x)
- 	dotm26=dotm/1.d+26
+	  msun=1.989d33
+      g=6.67d-8
+      pi=3.1416d0
+! Stefan-Boltzmann constant
+      sigma=5.67d-5
 
-	msun=1.989d33
-        g=6.67d-8
-        pi=3.1416d0
-c       rs=g*m*1.d6*msun/9.d20
-
-	fvis=3./8./pi*g*mass/x**3.d0*dotm26*1.d26*(1.-(3.*rs/x)**0.5d0)
-c	fvis=3./8./pi*g*mass/x**3.d0*dotm26*1.d26
-
-	m8=mass/solarmass/1.d+8
-	r14=x/1.d+14
-c	tem=2.2d+5*dotm26**0.25d0*m8**0.25d0*r14**(-0.75d0)
-
+! Dissipation rate
+	  fvis=3./8./pi/sigma*g*mass/x**3.d0*dotm*(1.-(3.*rs/x)**0.5d0)
+	
 ! Temperature
-	tem=(fvis/5.67d-5)**0.25d0
+	  tem=fvis**0.25d0
 
 c for the above formula, see the first page of Chapter 8 in <<accretion>> book
 
 	if (h*nu/(k*tem).gt.700.) then
- 	 f=0.d0
+ 	  f=0.d0
 	else
-         f=x/(dexp(h*nu/(k*tem))-1.d0)
+      f=x/(dexp(h*nu/(k*tem))-1.d0)
 	endif
 
 	return
