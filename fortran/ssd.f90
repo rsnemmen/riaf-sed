@@ -9,8 +9,8 @@
 
 
 module globals
-real,save :: dotm,mass,rs,rin
-real,parameter :: h=6.626d-27, c=2.9979d+10, k=1.3807d-16, pi=3.1416d0, &
+real(kind=8),save :: dotm,mass,rs,rin,dotme,rout,theta
+real(kind=8),parameter :: h=6.626d-27, c=2.9979d+10, k=1.3807d-16, pi=3.1416d0, &
 		pc=3.086d+18, solarmass=1.989d+33, g=6.672d-8, sigma=5.67d-5
 end module globals
 
@@ -20,8 +20,9 @@ end module globals
 program ssd
 use globals
 implicit none
-real, dimension :: y(4),dy(4),w(16),nu(200),fnu(200)
-real(kind=8) :: mass,nu,k,h,nnu
+real :: y(4),dy(4),w(16),nu(200),fnu(200)
+real(kind=8) :: nnu,s
+integer :: i,n
 	
 ! Output file
 open(20,file='ssd_alone.dat')
@@ -50,7 +51,7 @@ do i=1,50
 
 	nnu=nu(i)
 	s=0.d0
-	call simpsn(rin,rout,1.d-3,8000,n,s,nnu)
+	call simpsn(rin,rout,1d-3,8000,n,s,nnu)
 
 	fnu(i)=4.*pi*h*cos(theta)*nu(i)**3.d0/c/c*s 
 	write(20,*) log10(nu(i)),log10(nu(i)*fnu(i)*4.*pi)
@@ -68,7 +69,7 @@ end program
 function f(x,nu)
 use globals
 implicit none
-real(kind=8) :: mass,nu
+real(kind=8) :: nu
 real :: x,tem,fvis,f
 
 ! Dissipation rate, see the first page of Chapter 8 in <<accretion>> book
@@ -95,7 +96,7 @@ end function
 subroutine simpsn(a,b,eps,k,n,s,nu)
 implicit none
 real(kind=8) :: nu
-integer :: n,i
+integer :: n,i,k
 real :: a,b,c,h,t1,f,t2,x,s,s0,eps
 
 n=1
