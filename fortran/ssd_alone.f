@@ -89,7 +89,7 @@ c=====================================================================c
 	function f(x,nu)
 	implicit real*8(a-h,o-z)
 	common dotm,h,k,mass,rs,solarmass,rin
-	double precision mass,nu,k,m8,msun
+	double precision mass,nu,k,msun,g,pi,sigma
 
 	  msun=1.989d33
       g=6.67d-8
