@@ -255,7 +255,7 @@ foreach (@x) {
 # Calls adaf Fortran code and computes dynamical solution
 sub dynamics {
 # Opens pipe to ADAF dynamics code
-open(DYN,"|~/work/projects/finished/liners/adafcode/fortran/dynamics_new | tee -a $diag") || 
+open(DYN,"|~/work/projects/adafjet/adaf/fortran/dynamics_new | tee -a $diag") || 
 	die "Can't open program dynamics_new! \n";
 
 # Passes arguments to the fortran code

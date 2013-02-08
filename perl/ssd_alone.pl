@@ -34,7 +34,7 @@ $outfile="ssd_alone.dat";
 #&readParam;
 
 # Opens pipe to ADAF dynamics code
-open(SSD,"|~/Documents/work/projects/finished/liners/adafcode/fortran/ssd_alone");
+open(SSD,"|~/work/projects/adafjet/adaf/fortran/ssd_alone");
 
 #print SSD "$distance \n";
 print SSD "$m \n";

@@ -18,9 +18,9 @@ use File::Copy;
 &readParam;
 
 # Opens pipe to ADAF dynamics code
-open(SSD,"|~/Documents/work/projects/finished/liners/adafcode/fortran/ssd_new");
+open(SSD,"|~/work/projects/adafjet/adaf/fortran/ssd_alone");
 
-print SSD "$distance \n";
+#print SSD "$distance \n";
 print SSD "$m \n";
 print SSD "$dotm0 \n";
 print SSD "$rin \n";
@@ -28,9 +28,10 @@ print SSD "$theta \n";
 
 close(SSD);
 
+
 # The code dumps the spectrum at <filename>_ssd (filename is specified 
 # by the user).
-move("ssd.dat",$outfile . "_ssd")  or 
+move("ssd_alone.dat",$outfile . "_ssd")  or 
     die "Additional spectrum file cannot be copied. \n";
 print "\nCreated file: ${outfile}_ssd \n";
 

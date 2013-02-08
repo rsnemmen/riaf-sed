@@ -135,7 +135,7 @@ close PARFILE;
 sub withoutCompt {
 
 # Opens pipe to ADAF spectrum code
-open(SPEC,"|~/work/projects/finished/liners/adafcode/fortran/spectrum_new");
+open(SPEC,"|~/work/projects/adafjet/adaf/fortran/spectrum_new");
 
 # Runs first without Comptonization!
 print SPEC "$beta \n";
@@ -216,7 +216,7 @@ $nuf=$nuf . "d0";
 # calculated from the first run.
 sub withCompt {
 # Opens pipe to ADAF dynamics code
-    open(SPEC,"|~/work/projects/finished/liners/adafcode/fortran/spectrum_new");
+    open(SPEC,"|~/work/projects/adafjet/adaf/fortran/spectrum_new");
 
 # 2nd run with Comptonization enabled
     print SPEC "$beta \n";
