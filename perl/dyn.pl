@@ -25,11 +25,6 @@ $bench0 = new Benchmark;
 
 # Initializes gnuplot
 use Chart::Gnuplot;
-$chart = Chart::Gnuplot->new(
-    terminal => 'aqua',
-    xrange  => "[:60]"
-);
-$dataSet = Chart::Gnuplot::DataSet->new(datafile => $diag);
 
 $sl0=$sl0i;
 # Calculates the increment in sl0 given the desired number of models
@@ -56,7 +51,7 @@ print "\n \nEigenvalue = $sl0 \nIteration $iterat \nBrackets $brackets \n \n";
 &diagnose;
 
 # Plots radius x v_r/c_s for the solution
-$chart->plot2d($dataSet);
+&plot;
 
 # Decides if the solution is OK or not, and what should be done next
 if ($increase==1 && $discont==0 && $weirdam==0 && $sonic !~ /Problem!/ && $nan==0 && $nooutput==0) {
@@ -100,7 +95,7 @@ if ($increase==1 && $discont==0 && $weirdam==0 && $sonic !~ /Problem!/ && $nan==
   print "\nBracketing condition found \n";
   $iterat++;
   $brackets++;
-  	
+    
   } else {
   print "\nSomething weird happened! Check conditions! \n";
   $ops=1;
@@ -148,8 +143,8 @@ print "\nThe code took: ", timestr($dbench),"\n";
 sub diagnose {
 # Opens the output file from the dynamics code
 open (INFILE, $diag) || 
-	die "Can't open $diag !";
-	
+  die "Can't open $diag !";
+  
 # Resets all arrays
 @x=( );
 @y=( );
@@ -265,7 +260,7 @@ foreach (@x) {
 sub dynamics {
 # Opens pipe to ADAF dynamics code
 open(DYN,"|~/work/projects/adafjet/adaf/fortran/dynamics_new | tee -a $diag") || 
-	die "Can't open program dynamics_new! \n";
+  die "Can't open program dynamics_new! \n";
 
 # Passes arguments to the fortran code
 # Adiabatic index gamma
@@ -333,13 +328,13 @@ print LOGFILE "# Auxiliary values: \n";
 print LOGFILE "# " . ($tvir/1e9) . "e+9 - T_vir - Virial temperature at the outer boundary \n";
 print LOGFILE "# \n";
 print LOGFILE "# Meaning of columns below: \n";
-print LOGFILE "# 1. radius	8. H \n";
-print LOGFILE "# 2. v_R/c_s	9. q_rad (cooling rate/volume) \n";
-print LOGFILE "# 3. log(T_e)	10. tau (optical depth) \n";
-print LOGFILE "# 4. log(T_i)	11. log(l_k) (spec. ang. mom. Kepl.) \n";
-print LOGFILE "# 5. q_advi/q_vis	12. log(l) (spec. ang. mom.) \n";
-print LOGFILE "# 6. (q_advi+q_adve)/q_vis	13. magnetic field \n";
-print LOGFILE "# 7. c_s/c	14. log(rho) \n";
+print LOGFILE "# 1. radius  8. H \n";
+print LOGFILE "# 2. v_R/c_s 9. q_rad (cooling rate/volume) \n";
+print LOGFILE "# 3. log(T_e)  10. tau (optical depth) \n";
+print LOGFILE "# 4. log(T_i)  11. log(l_k) (spec. ang. mom. Kepl.) \n";
+print LOGFILE "# 5. q_advi/q_vis  12. log(l) (spec. ang. mom.) \n";
+print LOGFILE "# 6. (q_advi+q_adve)/q_vis 13. magnetic field \n";
+print LOGFILE "# 7. c_s/c 14. log(rho) \n";
 print LOGFILE "# \n";
 close(LOGFILE);
 }
@@ -419,7 +414,7 @@ sub readParam {
 $input="in.dat";
 
 open (PARFILE, $input) || 
-	die "Can't open $input !";
+  die "Can't open $input !";
 
 # The field separator is "=". It is important that the input values in the
 # parameter file are in the strict format "var=value" (no quotes).
@@ -450,3 +445,19 @@ close PARFILE;
 }
 
 
+
+
+
+
+# Calls gnuplot to plot radius 
+sub plot {
+
+my $chart = Chart::Gnuplot->new(
+    terminal => 'aqua',
+    xrange  => "[:60]"
+);
+
+my $dataSet = Chart::Gnuplot::DataSet->new(datafile => $diag);
+
+$chart->plot2d($dataSet);
+}
