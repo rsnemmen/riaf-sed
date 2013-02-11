@@ -13,9 +13,6 @@
 # and follow the readme instructions to install it.
 use Math::Derivative qw(Derivative1 Derivative2); 
 
-# Needed so that I can plot with Gnuplot
-use FileHandle; # see http://perl.plover.com/FAQs/Buffering.html
-
 # Module needed to benchmark the execution time of the code
 use Benchmark; # see http://perldoc.perl.org/Benchmark.html
 $bench0 = new Benchmark;
@@ -25,6 +22,14 @@ $bench0 = new Benchmark;
 
 # Determines the outer boundary conditions
 &findBCs;
+
+# Initializes gnuplot
+use Chart::Gnuplot;
+$chart = Chart::Gnuplot->new(
+    terminal => 'aqua',
+    xrange  => "[:60]"
+);
+$dataSet = Chart::Gnuplot::DataSet->new(datafile => $diag);
 
 $sl0=$sl0i;
 # Calculates the increment in sl0 given the desired number of models
@@ -49,6 +54,9 @@ print "\n \nEigenvalue = $sl0 \nIteration $iterat \nBrackets $brackets \n \n";
 
 # Diagnose if the computed solution is physical or not
 &diagnose;
+
+# Plots radius x v_r/c_s for the solution
+$chart->plot2d($dataSet);
 
 # Decides if the solution is OK or not, and what should be done next
 if ($increase==1 && $discont==0 && $weirdam==0 && $sonic !~ /Problem!/ && $nan==0 && $nooutput==0) {
@@ -124,6 +132,7 @@ if ($ops == 1) {
 $bench1 = new Benchmark;
 $dbench = timediff($bench1, $bench0);
 print "\nThe code took: ", timestr($dbench),"\n";
+
 
 
 
@@ -291,6 +300,11 @@ close(DYN);
 
 
 
+
+
+
+
+
 # Prints header of each solution
 sub header {
 # Some auxiliary calculations (needed only for the header of the log file)
@@ -331,12 +345,25 @@ close(LOGFILE);
 }
 
 
+
+
+
+
+
+
 # Function that converts from the double numeric format (1.d0) to real (1.e0)
 sub convDbl {
    $temp=$_[0];
    $temp =~ s/d/e/;
    return $temp;
 }
+
+
+
+
+
+
+
 
 
 
@@ -371,6 +398,12 @@ $te=$te*$tvir . "d0";
 #$vcs=0.503-3.03e-5*convDbl($rout);
 #$vcs=$vcs . "d0";
 }
+
+
+
+
+
+
 
 
 
@@ -415,3 +448,5 @@ while (<PARFILE>) {
 
 close PARFILE;
 }
+
+
