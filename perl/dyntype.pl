@@ -451,8 +451,7 @@ $chart->plot2d($dataSet);
 
 sub plot{
 my $multiChart = Chart::Gnuplot->new(
-    terminal => 'aqua',
-    xrange  => "[:60]"
+    terminal => 'aqua'
 );
 
 #----------------------------------------
@@ -460,10 +459,12 @@ my $multiChart = Chart::Gnuplot->new(
 my @charts = ();
 $charts[0][0] = Chart::Gnuplot->new(
     title => "v_r/c_s",
+    xrange  => "[:60]",
 );
 my $dataSet = Chart::Gnuplot::DataSet->new(
     xdata => \@x,
-    ydata => \@y
+    ydata => \@y,
+    style     => "linespoints",
 );
 $charts[0][0]->add2d($dataSet);
 #----------------------------------------
@@ -472,10 +473,12 @@ $charts[0][0]->add2d($dataSet);
 # Top right chart
 $charts[0][1] = Chart::Gnuplot->new(
     title => "d/dr(v_r/c_s)",
+    xrange  => "[:60]"
 );
 $dataSet = Chart::Gnuplot::DataSet->new(
     xdata => \@x,
-    ydata => \@dydx
+    ydata => \@dydx,
+    style     => "linespoints",
 );
 $charts[0][1]->add2d($dataSet);
 #----------------------------------------
@@ -484,10 +487,12 @@ $charts[0][1]->add2d($dataSet);
 # Bottom left chart
 $charts[1][0] = Chart::Gnuplot->new(
     title => "d2/dr2 (v_r/c_s)",
+    xrange  => "[:60]"
 );
 $dataSet = Chart::Gnuplot::DataSet->new(
     xdata => \@x,
-    ydata => \@d2ydx2
+    ydata => \@d2ydx2,
+    style     => "linespoints",
 );
 $charts[1][0]->add2d($dataSet);
 #----------------------------------------
