@@ -37,6 +37,7 @@ use Chart::Gnuplot;
 
 
 # Main loop
+print "Enter eigenvalue: ";
 while (<STDIN>) {
 
 chomp;
@@ -423,15 +424,81 @@ close PARFILE;
 
 
 
-# Calls gnuplot to plot radius 
-sub plot {
+# Calls gnuplot to plot r, vr/cs, d/dr(vr/cs), d/dr^2(vr/cs)
+sub plott {
 
 my $chart = Chart::Gnuplot->new(
     terminal => 'aqua',
     xrange  => "[:60]"
 );
 
-my $dataSet = Chart::Gnuplot::DataSet->new(datafile => $diag);
+#my $dataSet = Chart::Gnuplot::DataSet->new(datafile => $diag);
+my $dataSet = Chart::Gnuplot::DataSet->new(
+    xdata => \@x,
+    ydata => \@y
+);
 
 $chart->plot2d($dataSet);
+}
+
+
+
+
+
+
+
+
+
+sub plot{
+my $multiChart = Chart::Gnuplot->new(
+    terminal => 'aqua',
+    xrange  => "[:60]"
+);
+
+#----------------------------------------
+# Top left chart
+my @charts = ();
+$charts[0][0] = Chart::Gnuplot->new(
+    title => "v_r/c_s",
+);
+my $dataSet = Chart::Gnuplot::DataSet->new(
+    xdata => \@x,
+    ydata => \@y
+);
+$charts[0][0]->add2d($dataSet);
+#----------------------------------------
+
+#----------------------------------------
+# Top right chart
+$charts[0][1] = Chart::Gnuplot->new(
+    title => "d/dr(v_r/c_s)",
+);
+$dataSet = Chart::Gnuplot::DataSet->new(
+    xdata => \@x,
+    ydata => \@dydx
+);
+$charts[0][1]->add2d($dataSet);
+#----------------------------------------
+
+#----------------------------------------
+# Bottom left chart
+$charts[1][0] = Chart::Gnuplot->new(
+    title => "d2/dr2 (v_r/c_s)",
+);
+$dataSet = Chart::Gnuplot::DataSet->new(
+    xdata => \@x,
+    ydata => \@d2ydx2
+);
+$charts[1][0]->add2d($dataSet);
+#----------------------------------------
+
+#----------------------------------------
+# Bottom right chart
+$charts[1][1] = Chart::Gnuplot->new(
+    title => "",
+);
+#----------------------------------------
+
+# Plot the multplot chart
+$multiChart->multiplot(\@charts);
 }
