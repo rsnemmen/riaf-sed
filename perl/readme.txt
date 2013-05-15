@@ -11,6 +11,8 @@ dyn.pl - computes ADAF dynamics
 spectrum.pl - generates ADAF SED once you get a good global solution 
 ssd.pl - computes truncated thin disk SED
 
+For visualizing the resulting SEDs, use the code 'work/projects/finished/liners/seds/misc/model.py'
+
 The image readme.png shows a screenshot of my Mac OS X during a typical parallel run. This is especially useful in multi-core/multi-processor architectures since Feng's code is serial and it would take a considerable amount of effort to make it parallel.
 
 If you are having trouble finding a global solution, try playing around with dyntype.pl. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.

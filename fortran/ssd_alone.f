@@ -23,23 +23,20 @@ c in unit of cm.g.sec
 	pi=3.1416d0
 	pc=3.086d+18
 	solarmass=1.989d+33
-
-!        read(*,*) distance
-!        distance=distance*pc
-c	distance=14.5d6*pc !--------------1-----------------!
-
-        read(*,*) mass
-        mass=mass*1.d6*solarmass
-c	mass=1.2d8*solarmass !--------------2-----------------!
-
 	g=6.672d-8
+
+	read(*,*) mass
+	mass=mass*1.d6*solarmass
+
+
 	rs=2.*g*mass/c/c
 	dotme=1.39d18*mass/solarmass
+
 c note in the above defination, the factor of 0.1 is included
 c the unit is g/s
 
-c***********************************
-c *** I still did not figure this out. By comparing the output of
+c ***********************************
+c I still did not figure this out. By comparing the output of
 c this code with the SSD models in Lasota+96, Quataert+99, Nemmen+06,
 c for the same mdot the SSD SEDs there are 10x weaker compared to the
 c output of this code. By hand I introduced below a factor 0.1 for
@@ -49,14 +46,12 @@ c UPDATE Mar 8th 2012
 c Still wondering about the 0.1 factor below
 c **********************************
       read(*,*) dotm
-c      dotm=0.1d0*dotm*dotme
-      dotm=dotm*dotme
+      dotm=0.1d0*dotm*dotme
+c      dotm=dotm*dotme
 c	  dotm=6.4d-4*dotme !--------------3-----------------!
 	
       read(*,*) rin
       rin=rin*rs
-c	rin=225.d0*rs  !--------------4-----------------!
-c	rout=3.0d+4*rs  !--------------5-----------------!
 
       read(*,*) theta
 	  theta=theta/57.2958 !--------------6-----------------!

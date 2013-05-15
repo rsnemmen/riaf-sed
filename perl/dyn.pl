@@ -51,7 +51,7 @@ print "\n \nEigenvalue = $sl0 \nIteration $iterat \nBrackets $brackets \n \n";
 &diagnose;
 
 # Plots radius x v_r/c_s for the solution
-&plot;
+#&plot;
 
 # Decides if the solution is OK or not, and what should be done next
 if ($increase==1 && $discont==0 && $weirdam==0 && $sonic !~ /Problem!/ && $nan==0 && $nooutput==0) {
