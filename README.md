@@ -3,32 +3,43 @@ ADAF dynamics and spectrum
 
 Routines to compute the spectral energy distributions of radiatively inefficient accretion flows (aka RIAFs or ADAFs - advection-dominated accretion flows).
 
+# Installation
+
+    cd fortran
+    make
+    
+Fortran binaries located in `fortran` dir. Perl binaries in `perl` dir.
+
+## Requirements
+
+- Fortran compiler (e.g., gfortran)
+- Perl
+- Gnuplot
+- Perl modules: `Math::Derivative`, `Chart::Gnuplot`
+
+How to install Perl modules:
+
+    cpan App::cpanminus
+    sudo cpanm Math::Derivative
+    sudo cpanm Chart::Gnuplot
+
+
 # Usage
 
-Here is how I usually run the ADAF models in parallel. I created three folders inside adaf_code/perl named run01, run02 and run03. Inside each of these folders there is a parameter file in.dat. 
+**Setup**
 
-I open one terminal with three tabs corresponding to each folder (or three terminals). Then I edit the three input files corresponding to a set of models, and finally run the program at the same time in each terminal. The relevant codes are: 
-dyn.pl - computes ADAF dynamics
-spectrum.pl - generates ADAF SED once you get a good global solution 
-ssd.pl - computes truncated thin disk SED
+- cd to the directory that will contain the SED
+- edit the input file `in.dat` with the desired model parameters
 
-For visualizing the resulting SEDs, use the code 'work/projects/finished/liners/seds/misc/model.py'
+**Compute**
 
-The image readme.png shows a screenshot of my Mac OS X during a typical parallel run. This is especially useful in multi-core/multi-processor architectures since Feng's code is serial and it would take a considerable amount of effort to make it parallel.
+1. run `perl/dyn.pl` to compute ADAF dynamics to find physical global solution
+2. run `perl/spectrum.pl` to generate ADAF SED after you get a good global solution 
+3. optional: run `perl/ssd.pl` to compute truncated thin disk SED
 
-If you are having trouble finding a global solution, try playing around with dyntype.pl. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.
+For visualizing the resulting SEDs, use the code `work/projects/finished/liners/seds/misc/model.py`
 
-## Boundary conditions
-
-The guideline for setting the ADAF outer boundary conditions is:
-
-- For large Rout (greater than a few thousands r_g): e.g., rout=1e4rs, T_i=0.2 Tvir, T_e=0.19Tvir, vcs=0.2
-- For Rout~100Rs:
-e.g., rout=100 r_g, T_i=0.6 Tvir, T_e=0.08Tvir, vcs=0.5
-
-$R=ax$
-
-Regarding which boundary conditions to choose for each radius, please refer to the Appendix A of my [PhD thesis](http://hdl.handle.net/10183/16325) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta). 
+If you are having trouble finding a global solution, try playing around with `dyntype.pl`. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.
 
 
 ## Example of how to use the code in "parallel"
@@ -42,23 +53,16 @@ The image below shows a screenshot of OS X during a typical parallel run. This i
 ![OS X running code in parallel](./osxparallel.png =300x) 
 
 
-## Installation
 
+## Boundary conditions
 
+The guideline for setting the ADAF outer boundary conditions is:
 
+- Large Rout (R>~ a few thousand R_g): e.g., Rout=1e4 Rs, T_i=0.2 Tvir, T_e=0.19Tvir, vcs=0.2
+- Rout ~ 100Rs: e.g., Rout=100 R_g, T_i=0.6 Tvir, T_e=0.08Tvir, vcs=0.5
 
-### Requirements
+Please refer to the Appendix A of my [PhD thesis](http://hdl.handle.net/10183/16325) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta) for more information on the BC choices.
 
-- Fortran compiler
-- Perl
-- Gnuplot
-- Perl modules: Math::Derivative, Chart::Gnuplot
-
-How to install Perl modules:
-
-    cpan App::cpanminus
-    sudo cpanm Math::Derivative
-    sudo cpanm Chart::Gnuplot
 
 
 
@@ -182,6 +186,9 @@ Global solutions: [Manmoto et al. (1997)](http://iopscience.iop.org/article/10.1
 Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/10183/16325) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta). 
 
 # TODO
+
+- [ ] parallelize shooting method in `dyn.pl`
+- [ ] parallelize inverse Compton scattering in spectrum
 
 
 ---
