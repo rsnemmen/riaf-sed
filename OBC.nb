@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       145,          7]
-NotebookDataLength[     26713,        731]
-NotebookOptionsPosition[     24371,        651]
-NotebookOutlinePosition[     24782,        669]
-CellTagsIndexPosition[     24739,        666]
+NotebookDataLength[     27490,        758]
+NotebookOptionsPosition[     24991,        673]
+NotebookOutlinePosition[     25404,        691]
+CellTagsIndexPosition[     25361,        688]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -645,6 +645,28 @@ mE/kxyyEehW2vh0bsxHyAA5CjOQ=
  CellChangeTimes->{
   3.4133043965653687`*^9, {3.4133046724053917`*^9, 3.41330470446062*^9}, 
    3.4133047620813007`*^9, 3.41330481443132*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Virial temperature", "Subsection",
+ CellChangeTimes->{{3.670840655092204*^9, 3.670840657866304*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"\[Gamma]", "=", 
+   RowBox[{"5", "/", "3"}]}], ";"}]], "Input",
+ CellChangeTimes->{{3.670840672831395*^9, 3.6708406770023537`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"Tvir", "=", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{"\[Gamma]", "-", "1"}], ")"}], "*", "G", "*", "M", "*", 
+   RowBox[{"mp", "/", 
+    RowBox[{"(", 
+     RowBox[{"kb", "*", "R", "*", "Rs"}], ")"}]}]}]}]], "Input",
+ CellChangeTimes->{{3.670841842324893*^9, 3.670841878771771*^9}}]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
@@ -653,8 +675,8 @@ WindowSize->{640, 750},
 WindowMargins->{{Automatic, 276}, {Automatic, 18}},
 PrintingCopies->1,
 PrintingPageRange->{1, Automatic},
-FrontEndVersion->"9.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (January 25, \
-2013)",
+FrontEndVersion->"10.4 for Mac OS X x86 (32-bit, 64-bit Kernel) (February 25, \
+2016)",
 StyleDefinitions->"Default.nb"
 ]
 (* End of Notebook Content *)
@@ -712,7 +734,7 @@ Cell[8880, 270, 459, 7, 50, "Output"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[9388, 283, 94, 1, 80, "Section"],
+Cell[9388, 283, 94, 1, 64, "Section"],
 Cell[9485, 286, 137, 2, 30, "Text"],
 Cell[CellGroupData[{
 Cell[9647, 292, 420, 9, 28, "Input"],
@@ -725,11 +747,16 @@ Cell[11224, 337, 541, 10, 56, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
 Cell[11802, 352, 410, 11, 28, "Input"],
-Cell[12215, 365, 951, 22, 78, "Output"]
+Cell[12215, 365, 951, 22, 79, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
 Cell[13203, 392, 295, 7, 28, "Input"],
-Cell[13501, 401, 10830, 245, 240, "Output"]
+Cell[13501, 401, 10830, 245, 242, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[24368, 651, 106, 1, 44, "Subsection"],
+Cell[24477, 654, 166, 4, 28, "Input"],
+Cell[24646, 660, 305, 8, 28, "Input"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
@@ -737,4 +764,3 @@ Cell[13501, 401, 10830, 245, 240, "Output"]
 ]
 *)
 
-(* End of internal cache information *)
