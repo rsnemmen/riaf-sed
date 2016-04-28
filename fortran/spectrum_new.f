@@ -367,13 +367,12 @@ c-------------------------------------------------------------------
 c the following integration calculate the comptonization spectrum  |
 c-------------------------------------------------------------------
 
-        if(j.ge.jmin .and. j.le.(nvmax-10)) then
+    if(j.ge.jmin .and. j.le.(nvmax-10)) then
 	  eps=1.d-2
 	  fup=8.d+1		!-----------------------------(9)-----------------
-! *** line below was flo=1.0d0*(1.+1.d-2)
 	  flo=1.0d0*(1.+1.d-2)
 
-c here fup, flo denotes the Lolentz factor of electrons
+c here fup, flo denotes the Lorentz factor of electrons
 
           call simps2(flo,fup,eps,kflag,n,sum,
      $		rhorho,hh,setae,setai,fk2,nu(j),r(i),tau(i))
