@@ -17,13 +17,8 @@
 #   with gfortran too, otherwise ssd_new does not understand the ouput of
 #   dynamics_new. (2/28/2008)
 
-#g77 -trapfpe dynamics_new.f -o dynamics_new
-#g77 spectrum_new.f -o spectrum_new
 gfortran -O -ffpe-trap=invalid,zero dynamics_new.f -o dynamics_new
 gfortran -O spectrum_new.f -o spectrum_new
 gfortran -O ssd_new.f -o ssd_new
 gfortran -O ssd_alone.f -o ssd_alone
 
-#g77 -O spectrum_new.f -o spectrum_new
-#g77 -O ssd_new.f -o ssd_new
-#g77 -O ssd_alone.f -o ssd_alone

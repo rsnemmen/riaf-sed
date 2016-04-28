@@ -7,6 +7,15 @@
 # each solution is physical and bracket the right eigenvalue automatically. 
 # This is a mix of adaf_family_manyfiles and diagnose.pl.
 # This script requires you to press ctrl-C when a solution hangs.
+#
+# Algorithm:
+# - search eigenvalue space
+# - set a limit time for computations (like 20-30 sec), then switch to the next value
+#     - wait if program runs for too long
+#     - if so, kill it
+#     - how to identify the child?
+# - test if Mach > 1 in the inner regions and Mach decreases outwards
+# - test for smoothness nearby the sonic point
 
 # For computing derivatives. Download the required library from 
 # http://search.cpan.org/~jarw/Math-Derivative-0.01/Derivative.pm

@@ -1,12 +1,21 @@
-# How to use this code
+ADAF dynamics and spectrum
+======================
 
-You have to use the Perl scripts inside the perl folder. Please refer to the readme.txt inside that folder. 
+# Usage
 
-Regarding which boundary conditions to choose for each radius, please refer to the Appendix A of my PhD thesis or Yuan, Ma & Narayan 2008, ApJ, 679, 984. 
+You have to use the Perl scripts inside the `perl` folder. Please refer to the `readme.txt` inside that folder. 
 
-#Learnings
+## Example of how to use the code
 
-(All the text below was written before 4/18/2008) 
+## Requirements
+
+## Installation
+
+## Boundary conditions
+
+Regarding which boundary conditions to choose for each radius, please refer to the Appendix A of my [PhD thesis](http://hdl.handle.net/10183/16325) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta). 
+
+# More
 
 Eigenvalue parameter is usually between 1 and 3
 
@@ -43,50 +52,6 @@ Apparently the code "hangs" (stays processing for very long time) after passing 
 When I get lots of NaN and FAILED! results from the dynamics code for a broad range of eigenvalues given some values of the basic parameters, try changing slightly the boundary conditions. (11/6)
 
 To get the spectrum of the SSD you just need to run the dynamics code. (11/21)
-
-# Todo
-
-X Write a Perl program to drive the ADAF codes.
-
-X Understand what the code does:
-look Manmoto+97 and Narayan+97, global solutions
-check the proper behavior of the solution for v_r/c_s
-
-X Ideas for making the code automatic:
-- search eigenvalue space
-- set a limit time for computations (like 20-30 sec), then switch to the next value
-	- wait if program runs for too long
-	- if so, kill it
-	- how to identify the child?
-- see if the program crashes
-- test if Mach > 1 in the inner regions and Mach decreases outwards
-- test for smoothness nearby the sonic point
-
-Compare L from dynamics to L from spectrum.
-
-Find out why the Mac g77 compiler does not work, while the gfortran linux compiler works.
-- compare results from g77, gfortran in the two architectures
-X - install gfortran on ilarion
-
-X Understand and modify the new spectrum code.
-
-11/21: how to set the range of Comptonization correctly?
-why the mismatch between mdot in the adaf and ssd spectra?
-where does the code hang?
-
-# Questions
-
-X What are the input parameters? List them and ask confirmation. 
-What about y(1)=rout? Ask about the meaning of some variables.
-
-X How to get the transonic solution?
-
-X When I run the code I notice that I get "nice" transonic solutions for slightly different values of the shooting parameter (or eigenvalue). Illustrate with the BCs I have now for 2.3 and 2.31.
-How to pick the correct solution? 
-
-X What values of the boundary conditions should I pick? Or do I keep them the same?
-
-X How to make the search of eigenvalues automatic?
 
 
 # Software 
@@ -155,3 +120,30 @@ X How to make the search of eigenvalues automatic?
 
 ./perl/run*
   Folders created to store results from simultaneous runs of the code. Useful for exploiting the capabilities of the multi-core processors. Each run of the code goes into only one core.
+
+# References
+
+General, succint description of SED models: [Nemmen et al. 2014](http://mnras.oxfordjournals.org/content/438/4/2804)
+
+More details about models (in portuguese): [Rodrigo Nemmen's PhD thesis](http://hdl.handle.net/10183/16325)
+
+[Yuan et al. 2003](http://adsabs.harvard.edu/abs/2003ApJ...598..301Y)
+
+Global solutions: [Manmoto et al. (1997)](http://iopscience.iop.org/article/10.1086/304817/meta); [Narayan et al. (1997)](http://iopscience.iop.org/article/10.1086/303591/meta)
+
+Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/10183/16325) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta). 
+
+# TODO
+
+
+---
+
+
+&nbsp;
+
+&nbsp;
+
+Copyright (c) 2016, [Rodrigo Nemmen](http://rodrigonemmen.com), [Feng Yuan](http://center.shao.ac.cn/fyuan/yuan.html).
+[All rights reserved](http://opensource.org/licenses/BSD-2-Clause).
+
+
