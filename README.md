@@ -212,6 +212,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 
 # TODO
 
+- [ ] include examples of parameter files for different situations
 - [ ] parallelize shooting method in `dyn.pl`
 - [ ] parallelize inverse Compton scattering in spectrum
 

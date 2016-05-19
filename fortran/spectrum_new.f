@@ -367,7 +367,7 @@ c-------------------------------------------------------------------
 c the following integration calculate the comptonization spectrum  |
 c-------------------------------------------------------------------
 
-    if(j.ge.jmin .and. j.le.(nvmax-10)) then
+      if(j.ge.jmin .and. j.le.(nvmax-10)) then
 	  eps=1.d-2
 	  fup=8.d+1		!-----------------------------(9)-----------------
 	  flo=1.0d0*(1.+1.d-2)
