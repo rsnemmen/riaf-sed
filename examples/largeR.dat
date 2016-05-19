@@ -1,0 +1,47 @@
+# Input parameters for ADAF model
+# ==================================
+#
+# Dynamics
+# ***************************
+# Adiabatic index gamma
+gamai=1.5d0
+# Black hole mass (in 10^6 Solar masses)
+m=1.6d2
+# ratio of gas to total pressure
+beta=0.9d0
+# alpha viscosity
+alfa=0.3d0
+# Fraction of turbulent dissipation that directly heats electrons
+delta=0.1d0
+# Mdot_out (Eddington units)
+dotm0=3.1d-4
+# R_out (units of R_S)
+rout=1.d4
+# p_wind ("strength of wind")
+pp0=0.3d0
+#
+# Range of eigenvalues of the problem (the "shooting" parameter)
+# Initial and final value, number of models to be computed
+sl0i=2.0
+sl0f=3.0
+nmodels=10
+#
+# Outer boundary conditions (OBCs)
+# T_i (ion temperature) in units of the Virial temperature
+ti=0.2
+# T_e (electron temperature) 
+te=0.19
+# Mach number=v_R/c_s (radial velocity/sound speed)
+vcs=0.2d0
+#
+# Name of log file
+diag=out
+#
+# SED calculation
+# ***************************
+# distance (in pc)
+distance=14.5d6
+# Inclination angle of outer thin disk (in degrees)
+theta=30.
+# Spectrum filename
+spec=spectrum

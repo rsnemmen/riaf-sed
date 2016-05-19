@@ -31,20 +31,31 @@ How to install Perl modules:
 - cd to the directory that will contain the SED
 - edit the input file `in.dat` with the desired model parameters
 
-**Compute**
+**Compute a model SED**
 
-1. run `perl/dyn.pl` to compute ADAF dynamics to find physical global solution
-2. run `perl/spectrum.pl` to generate ADAF SED after you get a good global solution 
+1. run `perl/dyn.pl` to compute ADAF dynamics to find physical global solution, adjusting eigenvalue if required
+2. once you get a good (physical) global solution in step 1, run `perl/spectrum.pl` to generate ADAF SED 
 3. optional: run `perl/ssd.pl` to compute truncated thin disk SED
 
 For visualizing the resulting SEDs, use the code `work/projects/finished/liners/seds/misc/model.py`
 
 If you are having trouble finding a global solution, try playing around with `dyntype.pl`. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.
 
+## Examples of models
 
-## Example of how to use the code in "parallel"
+Two examples of input parameter files are included in the `examples` folder:
 
-Here is how I usually run the ADAF models in parallel. I created three folders inside `adaf_code/perl` named `run01`, `run02` and `run03`. Inside each of these folders there is a parameter file `in.dat`. 
+- `largeR.dat`: ADAF with *R_out=1E4 Rs*
+- `smallR.dat`: *R_out=500 Rs*
+
+In order to compute the corresponding models, please rename the files to `in.dat` before running.
+ 
+
+
+
+## Example of how to run in "parallel"
+
+Here is how I usually run the ADAF models in parallel ("dumb parallelization"). I created three folders inside `adaf_code/perl` named `run01`, `run02` and `run03`. Inside each of these folders there is a parameter file `in.dat`. 
 
 I open one terminal with three tabs corresponding to each folder (or three terminals). Then I edit the three input files corresponding to a set of models, and finally run the program at the same time in each terminal. Hence why "dumb parallelization".
 
