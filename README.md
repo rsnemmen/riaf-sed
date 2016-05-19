@@ -211,11 +211,9 @@ Opens a pipe to dynamics_new and computes the dynamics for a given set of parame
 
 # References
 
-General, succint description of SED models: [Nemmen et al. 2014](http://mnras.oxfordjournals.org/content/438/4/2804)
+General, succint description of SED models: [Nemmen et al. (2014)](http://mnras.oxfordjournals.org/content/438/4/2804)
 
-More details about models (in portuguese): [Rodrigo Nemmen's PhD thesis](http://hdl.handle.net/10183/16325)
-
-[Yuan et al. 2003](http://adsabs.harvard.edu/abs/2003ApJ...598..301Y)
+More details about models: [Rodrigo Nemmen's PhD thesis](http://hdl.handle.net/10183/16325) (in portuguese), [Yuan et al. (2003)](http://adsabs.harvard.edu/abs/2003ApJ...598..301Y)
 
 Global solutions: [Manmoto et al. (1997)](http://iopscience.iop.org/article/10.1086/304817/meta); [Narayan et al. (1997)](http://iopscience.iop.org/article/10.1086/303591/meta)
 
@@ -223,7 +221,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 
 # TODO
 
-- [ ] include examples of parameter files for different situations
+- [X] include examples of parameter files for different situations
 - [ ] parallelize shooting method in `dyn.pl`
 - [ ] parallelize inverse Compton scattering in spectrum
 
