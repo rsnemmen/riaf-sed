@@ -223,6 +223,8 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 
 - [X] include examples of parameter files for different situations
 - [ ] include comment about additional data files needed for computation
+- [ ] add dependency tree for executables (`romi.dat` etc)
+- [ ] perl codes: add location of fortran binaries as additional parameter
 - [ ] parallelize shooting method in `dyn.pl`
 - [ ] parallelize inverse Compton scattering in spectrum
 
