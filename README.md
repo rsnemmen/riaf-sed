@@ -30,6 +30,7 @@ How to install Perl modules:
 
 - cd to the directory that will contain the SED
 - edit the input file `in.dat` with the desired model parameters
+- include in this directory the following files: `aomi*dat`, `romi*dat`
 
 **Compute a model SED**
 
@@ -221,9 +222,9 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 
 # TODO
 
-- [X] include examples of parameter files for different situations
-- [ ] include comment about additional data files needed for computation
-- [ ] add dependency tree for executables (`romi.dat` etc)
+- [x] include examples of parameter files for different situations
+- [x] include comment about additional data files needed for computation
+- [x] ~~add dependency tree for executables (`romi.dat` etc)~~
 - [ ] perl codes: add location of fortran binaries as additional parameter
 - [ ] parallelize shooting method in `dyn.pl`
 - [ ] parallelize inverse Compton scattering in spectrum
