@@ -28,16 +28,16 @@ How to install Perl modules:
 
 **Setup**
 
+- edit `perl/dyn.pl` and `perl/spectrum.pl` and adjust the path to the executables (variables `$dynbinary` and `$specbin`)
 - cd to the directory that will contain the SED
 - edit the input file `in.dat` with the desired model parameters
 - include in this directory the following files: `aomi*dat`, `romi*dat`
 
 **Compute a model SED**
 
-1. edit `perl/dyn.pl` and `perl/spectrum.pl` and adjust the path to the executables (variables `$dynbinary` and `$specbin`)
-2. run `perl/dyn.pl` to compute ADAF dynamics to find physical global solution, adjusting range of eigenvalues `sl0i`,`sl0f` if required
-3. once you get a good (physical) global solution in step 2, run `perl/spectrum.pl` to generate ADAF SED 
-4. optional: run `perl/ssd.pl` to compute truncated thin disk SED
+1. run `perl/dyn.pl` to compute ADAF dynamics to find physical global solution, adjusting range of eigenvalues `sl0i`,`sl0f` if required
+2. once you get a good (physical) global solution in step 1, run `perl/spectrum.pl` to generate ADAF SED 
+3. optional: run `perl/ssd.pl` to compute truncated thin disk SED
 
 For visualizing the resulting SEDs, use the code `work/codes/python/model.py`
 
