@@ -7,7 +7,7 @@ Routines to compute the spectral energy distributions of radiatively inefficient
 
     cd fortran
     make
-    
+
 Fortran binaries located in `fortran` dir. Perl binaries in `perl` dir.
 
 ## Requirements
@@ -20,8 +20,8 @@ Fortran binaries located in `fortran` dir. Perl binaries in `perl` dir.
 How to install Perl modules:
 
     cpan App::cpanminus
-    sudo cpanm Math::Derivative
-    sudo cpanm Chart::Gnuplot
+    sudo cpan Math::Derivative
+    sudo cpan Chart::Gnuplot
 
 
 # Usage
