@@ -17,6 +17,9 @@
 # - test if Mach > 1 in the inner regions and Mach decreases outwards
 # - test for smoothness nearby the sonic point
 
+# Path to ADAF dynamics executable
+$dynbinary="~/work/projects/adafjet/adaf/fortran/dynamics_new";
+
 # For computing derivatives. Download the required library from 
 # http://search.cpan.org/~jarw/Math-Derivative-0.01/Derivative.pm
 # and follow the readme instructions to install it.
@@ -268,7 +271,7 @@ foreach (@x) {
 # Calls adaf Fortran code and computes dynamical solution
 sub dynamics {
 # Opens pipe to ADAF dynamics code
-open(DYN,"|~/work/projects/adafjet/adaf/fortran/dynamics_new | tee -a $diag") || 
+open(DYN,"| $dynbinary | tee -a $diag") || 
   die "Can't open program dynamics_new! \n";
 
 # Passes arguments to the fortran code

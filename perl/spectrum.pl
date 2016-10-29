@@ -3,6 +3,9 @@
 # Passes many arguments to the ADAF fortran codes sent by Feng Yuan.
 # You need first to compile these codes (of course).
 
+# Path to ADAF spectrum executable
+$specbin="~/work/projects/adafjet/adaf/fortran/spectrum_new";
+
 # For computing derivatives. Download the required library from 
 # http://search.cpan.org/~jarw/Math-Derivative-0.01/Derivative.pm
 # and follow the readme instructions to install it.
@@ -135,7 +138,7 @@ close PARFILE;
 sub withoutCompt {
 
 # Opens pipe to ADAF spectrum code
-open(SPEC,"|~/work/projects/adafjet/adaf/fortran/spectrum_new");
+open(SPEC,"| $specbin");
 
 # Runs first without Comptonization!
 print SPEC "$beta \n";
@@ -216,7 +219,7 @@ $nuf=$nuf . "d0";
 # calculated from the first run.
 sub withCompt {
 # Opens pipe to ADAF dynamics code
-    open(SPEC,"|~/work/projects/adafjet/adaf/fortran/spectrum_new");
+    open(SPEC,"| $specbin");
 
 # 2nd run with Comptonization enabled
     print SPEC "$beta \n";

@@ -34,11 +34,12 @@ How to install Perl modules:
 
 **Compute a model SED**
 
-1. run `perl/dyn.pl` to compute ADAF dynamics to find physical global solution, adjusting eigenvalue if required
-2. once you get a good (physical) global solution in step 1, run `perl/spectrum.pl` to generate ADAF SED 
-3. optional: run `perl/ssd.pl` to compute truncated thin disk SED
+1. edit `perl/dyn.pl` and `perl/spectrum.pl` and adjust the path to the executables (variables `$dynbinary` and `$specbin`)
+2. run `perl/dyn.pl` to compute ADAF dynamics to find physical global solution, adjusting range of eigenvalues `sl0i`,`sl0f` if required
+3. once you get a good (physical) global solution in step 2, run `perl/spectrum.pl` to generate ADAF SED 
+4. optional: run `perl/ssd.pl` to compute truncated thin disk SED
 
-For visualizing the resulting SEDs, use the code `work/projects/finished/liners/seds/misc/model.py`
+For visualizing the resulting SEDs, use the code `work/codes/python/model.py`
 
 If you are having trouble finding a global solution, try playing around with `dyntype.pl`. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.
 
@@ -225,7 +226,8 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 - [x] include examples of parameter files for different situations
 - [x] include comment about additional data files needed for computation
 - [x] ~~add dependency tree for executables (`romi.dat` etc)~~
-- [ ] perl codes: add location of fortran binaries as additional parameter
+- [x] perl codes: add location of fortran binaries as additional parameter
+- [ ] what parameters should I change for low BH masses?
 - [ ] parallelize shooting method in `dyn.pl`
 - [ ] parallelize inverse Compton scattering in spectrum
 
