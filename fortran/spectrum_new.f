@@ -854,6 +854,12 @@ c	pause
         end
 
 
+
+
+
+
+
+
 	subroutine simps2(a,b,eps,kflag,n,sum,rhorho,
      $		hh,setae,setai,fk2,nu,radaf,tau)
 	implicit real*8(a-h,o-z)
@@ -889,6 +895,12 @@ c  111111111111
 	n=-n
 	return
 	end
+
+
+
+
+
+
 
 	subroutine simps1(x,eps,kflag,n1,s,
      $		rhorho,hh,setae,setai,fk2,nu,radaf,tau)

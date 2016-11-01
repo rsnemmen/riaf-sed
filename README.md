@@ -227,9 +227,9 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 - [x] include comment about additional data files needed for computation
 - [x] ~~add dependency tree for executables (`romi.dat` etc)~~
 - [x] perl codes: add location of fortran binaries as additional parameter
-- [ ] what parameters should I change for low BH masses?
+- [x] what parameters should I change for low BH masses? cf. branch lowmass
 - [ ] parallelize shooting method in `dyn.pl`
-- [ ] parallelize inverse Compton scattering in spectrum
+- [ ] parallelize inverse Compton scattering in spectrum. Probably the trick is in fiddling with simps routines in comptonization loops
 
 
 ---
