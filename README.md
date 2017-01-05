@@ -28,7 +28,7 @@ How to install Perl modules:
 
 **Setup**
 
-- edit `perl/dyn.pl` and `perl/spectrum.pl` and adjust the path to the executables (variables `$dynbinary` and `$specbin`)
+- edit `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl` and adjust the path to the executables (variables `$dynbinary`, `$specbin` and `$specbin`, respectively)
 - cd to the directory that will contain the SED
 - edit the input file `in.dat` with the desired model parameters
 - include in this directory the following files: `aomi*dat`, `romi*dat`
