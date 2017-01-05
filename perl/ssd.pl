@@ -4,6 +4,10 @@
 # calculates the spectrum of the standard thin disk. You need first to 
 # compile these codes (of course).
 
+# Path to ADAF spectrum executable
+$specbin="~/work/projects/adafjet/adaf/fortran/ssd_alone";
+
+
 # Needed so that I can plot with Gnuplot
 use FileHandle; # see http://perl.plover.com/FAQs/Buffering.html
 
@@ -18,7 +22,7 @@ use File::Copy;
 &readParam;
 
 # Opens pipe to ADAF dynamics code
-open(SSD,"|~/work/projects/adafjet/adaf/fortran/ssd_alone");
+open(SSD,"| $specbin");
 
 #print SSD "$distance \n";
 print SSD "$m \n";

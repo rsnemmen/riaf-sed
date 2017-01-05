@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Passes many arguments to the fortran code sent by Feng Yuan that
+# Passes many arguments to the fortran code that
 # calculates the spectrum of the standard thin disk. You need first to 
 # compile these codes (of course).
 #
