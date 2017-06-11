@@ -259,7 +259,7 @@ c	stop
 
 c *** The statement "qbr=0" below must be commented out when focused on the 
 c Comptonization of Syn. photons. To do this I introduced qbreset variable which is 
-c readed from stdinput. 
+c read from stdinput. 
         if (qbreset .eq. 1.) then
 		qbr=0.d0
 	endif
