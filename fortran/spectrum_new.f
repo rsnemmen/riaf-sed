@@ -520,6 +520,16 @@ c     $			-log10(4.*3.1416*distance**2.)
 
         END
 
+
+
+
+
+
+
+
+
+
+
 	subroutine fls(x,y1,y2)
 	implicit real*8(a-h,o-z)
 	common /newnew/y3,y4
@@ -535,6 +545,15 @@ c *** Now y1 and y2 are taken from stdinput
 
         return
         end
+
+
+
+
+
+
+
+
+
 
 
         function f(x,y,rhorho,hh,setae,setai,fk2,nu,radaf,tau)
@@ -761,6 +780,17 @@ c now `2` moved out of this subrotine
 
         END
 	
+
+
+
+
+
+
+
+
+
+
+
 	subroutine simp(a,b,n,s,hh,r,tau,nunu)
         implicit real*8(a-h,o-z)
 	dimension repr(200),reprr(200),reph(200),emis(200),tau2(200)
@@ -852,6 +882,9 @@ c	pause
 
         return
         end
+
+
+
 
 
 
@@ -1079,6 +1112,19 @@ C IT IS CORRECT!!!!!!!!!!!!!!!
         return
         end
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 c 	SUBROUTINE SIMP2(A,B,EPS,SUM,rhorho,hh,setae,j,nu,ssum)
 	SUBROUTINE SIMP2(A,B,EPS,SUM,rhorho,hh,setae,j)
         implicit real*8(a-h,o-z)
@@ -1137,6 +1183,10 @@ c       FA=FCT(A,rhorho,hh,setae,j,nu,ssum)
         GOTO 4
 6       RETURN
         END
+
+
+
+
 
 
 c	function fct(gam,rhorho,hh,setae,jj,nu,ssum)
@@ -1285,6 +1335,13 @@ c	print*,'fct=',fct,jj,pro1
         END
 
 
+
+
+
+
+
+
+
 	SUBROUTINE SIMP3(A,B,EPS,SUM)
         implicit real*8(a-h,o-z)
         DIMENSION F(2,30),FM(2,30),E(2,30),KRTN(30)
@@ -1340,6 +1397,14 @@ c	print*,'fct=',fct,jj,pro1
 6       RETURN
         END
 
+
+
+
+
+
+
+
+
 	function fct3(x)
         implicit real*8(a-h,o-z)
 	fct3=(1.-4./x-8./x/x)*log(1.+x)+0.5d0+8./x-1./2./(1.+x)/(1.+x)
@@ -1368,6 +1433,9 @@ c	print*,'fct=',fct,jj,pro1
         return
         end
 
+
+
+
 	function f3(xx,omip1,gam1)
         implicit real*8(a-h,o-z)
 c	romip=3./8./gam1/omip1*log(4.*gam1*omip1)
@@ -1388,6 +1456,10 @@ c	romip=3./8./gam1/omip1*log(4.*gam1*omip1)
 	f3=coef*(term1+term2+term3)/2.
 	return
 	end
+
+
+
+
 
 	SUBROUTINE LAR(N,M,L,X,Y,A,B,C,Z)
 	implicit real*8(a-h,o-z)
@@ -1430,6 +1502,10 @@ c	romip=3./8./gam1/omip1*log(4.*gam1*omip1)
 8       Z(K)=W
         RETURN
         END
+
+
+
+
 
 	SUBROUTINE LAR2(N,M,L,X,Y,A,B,C,Z)
         implicit real*8(a-h,o-z)
