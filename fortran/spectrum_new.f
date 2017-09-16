@@ -804,6 +804,11 @@ c now `2` moved out of this subrotine
         return
         end
 
+
+
+
+
+
         function f2(x,hh,radaf,tau,nunu)
 c here small 'r' denotes the location in ADAF
         implicit real*8(a-h,o-z)
@@ -963,6 +968,10 @@ c 222222222222222
 	kflag=kflag+1
 	return
 	end
+
+
+
+
 
 	function mbsl4(n,x)
         double precision mbsl4,x,mbsl3
@@ -1124,7 +1133,9 @@ C IT IS CORRECT!!!!!!!!!!!!!!!
 
 
 
-
+! This routine is called several times furing the Comptonization.
+! It calls FCT several times
+! 
 c 	SUBROUTINE SIMP2(A,B,EPS,SUM,rhorho,hh,setae,j,nu,ssum)
 	SUBROUTINE SIMP2(A,B,EPS,SUM,rhorho,hh,setae,j)
         implicit real*8(a-h,o-z)
