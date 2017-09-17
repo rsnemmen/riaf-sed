@@ -218,6 +218,9 @@ c-----------------------------
 c       r(n+1)=r(n)/2.
 	r(n+1)=2.d0
 
+
+        ! biggest loop, goes through radial structure?
+        ! ==============================================
         do 20 i=1,n
  	print*,i
 
@@ -268,6 +271,8 @@ c------------------------------------------------------------------
 c the folowing calculate the luminosity at given frequency nu(j)  |
 c emissioned from per accretion disk ring within r(i-1) --> r(i)  |
 c------------------------------------------------------------------
+c second big loop, goes through frequencies
+c 
         do 30 j=1,nvmax
 ! the value of dlog(nu) below must match the value of nvmax (number of
 ! steps in SED)
@@ -391,6 +396,8 @@ c	print*,nulu(j),f(j),nu(j),sigma(i)
 
 	ssum(j)=sum*1.
 30      continue
+! end of big loop over frequencies
+!
 
 c---------------------------------------------------
 c the following calculate the second componization |
@@ -501,6 +508,8 @@ c       goto 20
 39      continue
 
 20      continue
+! end of big loop over radial structure
+!
 
 
 	totlu=0.d0
