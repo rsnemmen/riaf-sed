@@ -397,6 +397,7 @@ c the following calculate the second componization |
 c---------------------------------------------------
 	if(jmin .ge. nvmax)  goto 20
 
+    !$OMP PARALLEL DO PRIVATE(jj,sum2) SHARED(nulu2,ssum) REDUCTION(+:nulu2)
 	do 34 jj=jmin,nvmax
 c       call simp2(1.01d0,6.d+1,0.2d0,sum2,
 c    $		rhorho,hh,setae,jj,nu,ssum)
@@ -408,6 +409,7 @@ c    $		rhorho,hh,setae,jj,nu,ssum)
 
  	sssum(jj)=sum2*1.
 34	continue
+    !$ OMP END PARALLEL DO
 
 	do 134 l=1,200
 	ssum(l)=sssum(l)
@@ -1134,9 +1136,10 @@ C IT IS CORRECT!!!!!!!!!!!!!!!
 
 
 ! This routine is called several times furing the Comptonization.
-! It calls FCT several times
+! It calls FCT several times.
+! • the only variables that change between calls in the IC-calculation
+!   are SUM and J
 ! 
-c 	SUBROUTINE SIMP2(A,B,EPS,SUM,rhorho,hh,setae,j,nu,ssum)
 	SUBROUTINE SIMP2(A,B,EPS,SUM,rhorho,hh,setae,j)
         implicit real*8(a-h,o-z)
 c	double precision nu,ssum

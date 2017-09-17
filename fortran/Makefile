@@ -18,7 +18,7 @@ dynamics: dynamics_new.f
 	$(FC) $(FFLAGS) -ffpe-trap=invalid,zero dynamics_new.f -o dynamics_new
 
 spectrum: spectrum_new.f
-	$(FC) $(FFLAGS) spectrum_new.f -o spectrum_new
+	$(FC) $(FFLAGS) -fopenmp spectrum_new.f -o spectrum_new
 
 ssd: ssd_new.f
 	$(FC) $(FFLAGS) ssd_new.f -o ssd_new
