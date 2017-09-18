@@ -214,9 +214,10 @@ c note: tao is dimensionless
 c n presents the number of the rings of the ADAF disk
 c-----------------------------
 11      continue
+
         r(0)=r(1)
 c       r(n+1)=r(n)/2.
-	r(n+1)=2.d0
+	    r(n+1)=2.d0
 
 
         ! biggest loop, goes through radial structure?
@@ -361,8 +362,10 @@ c from per unit surface of the disk
 c	write(*,'(A,8e12.4)') 'fnu', nu(j),fk2,fxx,xx,qiabr,bnu,rhorho
 
 
-c transfer it to per ring the disk
-
+c Transfer it to per ring the disk
+c This breaks the independence between loop through the disk,
+c since r[i] depends on r[i-1]
+c
         sigma1=3.1416*((r(i-1)+r(i))**2.d0/4.d0-(r(i)+r(i+1))
      $          **2.d0/4.d0)/(6.77*6.77d-24)*m*m
         sigma2=3.1416*(r(i)*r(i)-r(i+1)*r(i+1))/(6.77*6.77d-24)*m*m
