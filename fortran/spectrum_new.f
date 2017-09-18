@@ -222,6 +222,8 @@ c       r(n+1)=r(n)/2.
 
         ! biggest loop, goes through radial structure?
         ! ==============================================
+!$OMP PARALLEL DO DEFAULT(PRIVATE) SHARED(nnu,nu,nulu,su,f,nulu2,nulu3, &
+!$OMP&  nulu4,nulu5,nulu6,nulu7) 
         do 20 i=1,n
  	print*,i
 
@@ -274,7 +276,6 @@ c emissioned from per accretion disk ring within r(i-1) --> r(i)  |
 c------------------------------------------------------------------
 c second big loop, goes through frequencies
 c
-        !$OMP PARALLEL DO PRIVATE(j,sum6,redshift,bnu,g1,g2,gaunt,qiabr,xx,fxx,fnu,sigma1,sigma2) SHARED(nnu,nu,nulu,su,f,sigma) REDUCTION(+:nulu)
         do 30 j=1,nvmax
 ! the value of dlog(nu) below must match the value of nvmax (number of
 ! steps in SED)
@@ -400,7 +401,6 @@ c	print*,nulu(j),f(j),nu(j),sigma(i)
 
 	ssum(j)=sum*1.
 30      continue
-        !$ OMP END PARALLEL DO
 ! end of big loop over frequencies
 !
 
@@ -513,6 +513,7 @@ c---------------------------------------------------
 
 
 20      continue
+!$ OMP END PARALLEL DO
 ! end of big loop over radial structure
 !
 
