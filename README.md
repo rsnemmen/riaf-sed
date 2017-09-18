@@ -1,7 +1,7 @@
 ADAF dynamics and spectrum
 ======================
 
-Routines to compute the spectral energy distributions of radiatively inefficient accretion flows (aka RIAFs or ADAFs - advection-dominated accretion flows).
+Routines to compute the spectral energy distributions of radiatively inefficient accretion flows (aka RIAFs or ADAFs - advection-dominated accretion flows). The spectral code is parallelized with OpenMP
 
 # Installation
 
@@ -229,7 +229,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 - [x] perl codes: add location of fortran binaries as additional parameter
 - [x] what parameters should I change for low BH masses? cf. branch lowmass
 - [ ] parallelize shooting method in `dyn.pl`
-- [ ] parallelize inverse Compton scattering in spectrum. Probably the trick is in fiddling with simps routines in comptonization loops
+- [x] parallelize inverse Compton scattering in spectrum. Inserted OpenMP directives in the comptonization loops
 
 
 ---

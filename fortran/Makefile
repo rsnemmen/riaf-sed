@@ -15,16 +15,16 @@ FFLAGS = -O
 all: dynamics spectrum ssd ssd_alone
 
 dynamics: dynamics_new.f
-	$(FC) $(FFLAGS) -ffpe-trap=invalid,zero dynamics_new.f -o dynamics_new
+	$(FC) $(FFLAGS) -ffpe-trap=invalid,zero $^ -o $@
 
-spectrum: spectrum_new.f
-	$(FC) $(FFLAGS) -fopenmp spectrum_new.f -o spectrum_new
+spectrum: spectrum.f
+	$(FC) $(FFLAGS) -fopenmp $^ -o $@
 
 ssd: ssd_new.f
 	$(FC) $(FFLAGS) ssd_new.f -o ssd_new
 
 ssd_alone: ssd_alone.f
-	$(FC) $(FFLAGS) ssd_alone.f -o ssd_alone
+	$(FC) $(FFLAGS) $^ -o $@
 
 clean:
 	rm -f *.o *.mod *_new *_alone
