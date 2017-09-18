@@ -404,7 +404,8 @@ c the following calculate the second componization |
 c---------------------------------------------------
 	if(jmin .ge. nvmax)  goto 20
 
-    !$OMP PARALLEL DO PRIVATE(jj,sum2) SHARED(nulu2,sssum) REDUCTION(+:nulu2)
+!$OMP PARALLEL DO PRIVATE(jj,sum2) SHARED(sssum) 
+!$OMP& REDUCTION(+:nulu2)
 	do 34 jj=jmin,nvmax
 c       call simp2(1.01d0,6.d+1,0.2d0,sum2,
 c    $		rhorho,hh,setae,jj,nu,ssum)
@@ -416,7 +417,7 @@ c    $		rhorho,hh,setae,jj,nu,ssum)
 
  	sssum(jj)=sum2*1.
 34	continue
-    !$ OMP END PARALLEL DO
+!$ OMP END PARALLEL DO
 
 	do 134 l=1,200
 	ssum(l)=sssum(l)
@@ -425,7 +426,8 @@ c---------------------------------------------------
 c the following calculate the third comptonization |
 c---------------------------------------------------
 
-    !$OMP PARALLEL DO PRIVATE(jj,sum3) SHARED(nulu3,ssssum) REDUCTION(+:nulu3)
+!$OMP PARALLEL DO PRIVATE(jj,sum3) SHARED(ssssum) 
+!$OMP& REDUCTION(+:nulu3)
 	do 35 jj=jmin+5,nvmax
 c       call simp2(1.01d0,6.d+1,0.2d0,sum3,
 c    $          rhorho,hh,setae,jj,nu,sssum)
@@ -437,7 +439,7 @@ c    $          rhorho,hh,setae,jj,nu,sssum)
 
  	ssssum(jj)=sum3*1.
 35      continue
-    !$ OMP END PARALLEL DO
+!$ OMP END PARALLEL DO
 
 	do 135 l=1,200
         ssum(l)=ssssum(l)
@@ -446,7 +448,8 @@ c---------------------------------------------------
 c the following calculate the fourth comptonization |
 c---------------------------------------------------
 
-    !$OMP PARALLEL DO PRIVATE(jj,sum4) SHARED(nulu4,sssssum) REDUCTION(+:nulu4)
+!$OMP PARALLEL DO PRIVATE(jj,sum4) SHARED(sssssum) 
+!$OMP& REDUCTION(+:nulu4)
         do 36 jj=jmin+15,nvmax
 c       call simp2(1.01d0,8.d+1,0.2d0,sum4,
 c     $          rhorho,hh,setae,jj,nu,ssssum)
@@ -457,7 +460,7 @@ c     $          rhorho,hh,setae,jj,nu,ssssum)
      $          *redshift**2.d0
  	sssssum(jj)=sum4*1.
 36      continue
-    !$ OMP END PARALLEL DO
+!$ OMP END PARALLEL DO
 
 c	print*,'nulu4'
 	do 136 l=1,200
@@ -467,7 +470,8 @@ c---------------------------------------------------
 c the following calculate the fiveth comptonization |
 c---------------------------------------------------
 
-    !$OMP PARALLEL DO PRIVATE(jj,sum5) SHARED(nulu5,ssuumm) REDUCTION(+:nulu5)
+!$OMP PARALLEL DO PRIVATE(jj,sum5) SHARED(ssuumm) 
+!$OMP& REDUCTION(+:nulu5)
         do 37 jj=jmin+15,nvmax
         call simp2(flo,fup,0.2d0,sum5,
      $          rhorho,hh,setae,jj)
@@ -476,7 +480,7 @@ c---------------------------------------------------
      $          *redshift**2.d0
  	ssuumm(jj)=sum5*1.
 37      continue
-    !$ OMP END PARALLEL DO
+!$ OMP END PARALLEL DO
 
 	do 137 l=1,200
         ssum(l)=ssuumm(l)
@@ -485,7 +489,8 @@ c---------------------------------------------------
 c the following calculate the sixth comptonization |
 c---------------------------------------------------
 
-    !$OMP PARALLEL DO PRIVATE(jj,sum6) SHARED(nulu6,ssssss) REDUCTION(+:nulu6)
+!$OMP PARALLEL DO PRIVATE(jj,sum6) SHARED(ssssss) 
+!$OMP& REDUCTION(+:nulu6)
         do 38 jj=jmin+20,nvmax
 c       call simp2(1.01d0,8.d+1,0.2d0,sum6,
 c    $          rhorho,hh,setae,jj,nu(jj),ssuumm(j))
@@ -497,7 +502,7 @@ c    $          rhorho,hh,setae,jj,nu(jj),ssuumm(j))
 
  	ssssss(jj)=sum6*1.
 38      continue
-    !$ OMP END PARALLEL DO
+!$ OMP END PARALLEL DO
 
 	do 138 l=1,200
         ssum(l)=ssssss(l)
@@ -507,7 +512,7 @@ c---------------------------------------------------
 c the following calculate the seventh comptonization |
 c---------------------------------------------------
 
-    !$OMP PARALLEL DO PRIVATE(jj,sum7) SHARED(nulu7) REDUCTION(+:nulu7)
+!$OMP PARALLEL DO PRIVATE(jj,sum7) REDUCTION(+:nulu7)
         do 39 jj=jmin+35,nvmax
         call simp2(flo,fup,0.2d0,sum7,
      $          rhorho,hh,setae,jj)
@@ -516,7 +521,7 @@ c---------------------------------------------------
      $          *redshift**2.d0
 
 39      continue
-    !$ OMP END PARALLEL DO
+!$ OMP END PARALLEL DO
 
 
 20      continue
