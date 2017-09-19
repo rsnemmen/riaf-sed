@@ -1,7 +1,7 @@
 ADAF dynamics and spectrum
 ======================
 
-Routines to compute the spectral energy distributions of radiatively inefficient accretion flows (aka RIAFs or ADAFs - advection-dominated accretion flows). The spectral code is parallelized with OpenMP
+Routines to compute the spectral energy distributions of radiatively inefficient accretion flows (aka RIAFs or ADAFs - advection-dominated accretion flows). The spectral code is parallelized with OpenMP.
 
 # Installation
 
@@ -12,7 +12,7 @@ Fortran binaries located in `fortran` dir. Perl binaries in `perl` dir.
 
 ## Requirements
 
-- Fortran compiler (e.g., gfortran)
+- Fortran compiler (e.g., gfortran) with OpenMP support
 - Perl
 - Gnuplot
 - Perl modules: `Math::Derivative`, `Chart::Gnuplot`

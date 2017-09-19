@@ -27,5 +27,5 @@ ssd_alone: ssd_alone.f
 	$(FC) $(FFLAGS) $^ -o $@
 
 clean:
-	rm -f *.o *.mod *_new *_alone
+	rm -f *.o *.mod *_new *_alone spectrum 
 
