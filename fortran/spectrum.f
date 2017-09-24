@@ -1,10 +1,30 @@
+!
+
+!2007.9.20 the spectrum without Compton scattering  can be derived by 
+! setting: Ntest=1.
+
 	
-C THIS CODE CALCULATE THE EMERGENT SPECTRUM FROM AN ADAF. 
+C THIS CODE CALCULATE THE EMERGENT SPECTRUM FROM AN ADAF-SSD SYSTEM. 
+C THE SOFT PHOTONS FROM SSD IS TAKEN INTO ACCOUNT AS SEED PHOTONS OF
+C COMPTONIZATION; THE REPROCESSING OF X-RAY PHOTONS BY SSD IS TAKEN 
+C INTO ACCOUNT 
 
 c description of using this code:
-c 1. units: I adopt the units of c=G=10^6M_sun=1 & cgs
-c 2. do not change data files 'romi-i.dat, aomi-i.dat, & aomi2-i.dat'
-c 3. 
+
+c 1. the code should be run twice to get a spectrum, with different ranges of
+c    frequencies. when focused on the Comptonization of BB photons,
+c    you should set 'qbr=0'; and in the subroutine 'fls', appropriate
+c    range of frequency should be set; when focused on the COmptonization
+c    of the syn. photons, comment out 'qbr=0', and choose appropriate frequency 
+c 2. Compared to the original code to calculate the spectrum of ADAF,
+c    two changes here: 1. consider the seed photonn of BB from SSD; and 2. 
+c    consider the reprocessing of ADAF emission by the SSD. The emission from
+c    ADAF is absorbed and reflected. In this code, only the former case
+c    is included. another seperate code has to be used to calculate the 
+c   reflection spectrum. In this code, a parameter to describe the albedo is
+c    used and set to 0.8, i.e., most of the emission from ADAF is aabsorbed.
+
+c---------------2003, 6.9-----------------
 
 	IMPLICIT REAL*8(A-H,O-Z)
         dimension r(0:3000),mach(3000),te(3000),ti(3000),
@@ -12,12 +32,15 @@ c 3.
      $          ,nulu(200),f(200),rr(0:3000),sigma(0:1000),nulu2(200)
      $		,nulu3(200),ssum(200),sssum(200),ssssum(200),nulu4(200)   
      $		,nulu5(200),sssssum(200),tau(200),ssuumm(200),nulu6(200)
-     $	,nulu7(200),ssssss(200),a1(30),b1(10),c1(30,10,1),z(1)
+     $	,nulu7(200),ssssss(200),a1(30),b1(10),c1(30,10,1),z(1),su(200)
 	dimension a2(100),b2(80),c2(100,80,1),z2(1),a3(100),b3(80),
      $		c3(100,80,1),z3(1)
 	double precision mach,nu,nnu,nulu,mui,mue,m,mbsl4,kapa,mc2h
      $		,nulu2,nulu3,nulu4,nulu5,nulu6,nulu7,ssum
 
+c *** Added y3 and y4 to a new common block. They are respectively y1 and y2 in
+c the fls subroutine
+	common /newnew/y3,y4
 	common mui,mue,m,dotm0,rtran,beta,mc2h
 	common /comp1/nu,ssum
 	common /comp2/a1,b1,c1,a2,b2,c2,a3,b3,c3
@@ -68,28 +91,91 @@ c 3.
 64      continue
 63      continue
 
-        beta=0.9d0
+c ratio of gas to total pressure
+c	print *,'beta:'
+	read(*,*) beta
+c	print *,'#beta',beta
+c        beta=0.9d0	!---------------------------1--------------------
         ru=9.2d-14
 
-	m=10.d0
+c	print *,'Black hole mass (in Solar masses):'
+	read(*,*) m
+c	print *,'#m',m
+c	m=1.d2	!---------------------------2-------------------
+
+c	print *,'Distance (in pc):'
+	read(*,*) distance
+	distance=distance*3.09d18
+c	distance=5.3d3*3.09d18	!-------------------(3)------------------
+c !!!!!!!!!!!!!!
 
         mc2h=1.236d+20
 	mui=1.24d0
         mue=1.13d0
-	nulu=0.d0
+c	nulu=0.d0
 	n=0
+
+c	print *,'alpha:'
+	read(*,*) alfa
+c	print *,'#alfa',alfa
+c	alfa=0.3d0	!---------------------------4---------------------
 
 c change below!!!!
 	dotme=3.44d-15*m
-c       dotm0=dotme*1.d-2
-	rtran=200.d0
+! if there is no outflow, this value does not affect the spectrum.
+c	print *,'Mdot_out (Eddington units):'
+	read(*,*) dotm0
+c	print *,'#dotm',dotm0
+c       dotm0=dotme*1.d-1	!--------------------(5)-----------------------
+	
+c	print *,'R_out (units of R_S):'
+	read(*,*) rtran	
+	rtran=2.*rtran
+c	print *,'#rtran',rtran
+c	rtran=200.d0	!---------------------------(6)-----------------------
 
-	open(23,file='s5-test.dat')
-        open(13,file='1.dat')
-	open(14,file='hottem1.dat')
+c *** Added: reads from stdinput the limits of second Comptonization (y1=y3 and y2=y4 defined
+c inside subroutine fls).
+	read(*,*) y3
+	read(*,*) y4
+c	print *,'#nui',y3
+c	print *,'#nuf',y4
+	
+c *** Reads variable qbreset. 0 if qbr is untouched, 1 if qbr=0.
+	read(*,*) qbreset
+c	print *,'#qbreset',qbreset
+
+	open(23,file='spectrum.dat')
+!	open(23,file='s5.dat')
+	open(24,file='ses5.dat')
+        open(13,file='x.dat')
+!        open(13,file='2-3.dat')
+	open(14,file='hot.dat')
 c 13 and 14 are two input files
 
-        do 11 i=1,46
+! before plot the spectra, we need to see where the synchrotron peak is.
+! Ntest is an integer to do this. ntest=1 the results is calculated without 
+! considering the Compton heating. ntest=0 considering.
+c	Ntest=0    
+
+c *** Reads variable Ntest from STDIN
+	read(*,*) Ntest  !-----------------------0-----------------------!
+c	print *,'#ntest',Ntest
+	nvmax=100 ! number of points in SED *** was 80!
+	if (ntest .eq. 0) then
+	   jmin=5
+	else if (ntest .eq. 1) then
+	   jmin=nvmax+1
+	end if
+c	print*,jmin
+
+c *** Nlines below is the number of lines in the file created by the
+c dynamics code. Previously the code had a fixed value for Nlines, but now
+c I determine it self-consistently with the Perl script.
+	read(*,*) Nlines
+c	print *,'#nlines',Nlines
+
+        do 11 i=1,Nlines	!-----------------------------7---------------------------
         n=n+1
 c now input the data
 
@@ -99,7 +185,12 @@ c now input the data
 	te(i)=10.d0**te(i)
 
         ti(i)=10.d0**ti(i)
-	tao(i)=10.d0**tao(i)
+	tao(i)=10.d0**tao(i)*1.0
+
+c	if(r(i).lt.15.d0) then
+c       te(i)=te(i)*1.44*(r(i)*2.)**(-0.2d0)
+c       tao(i)=tao(i)*1.806*(r(i)*2.)**(-0.1738d0)
+c       endif
 
 	r0=r(1)
 	do 12 j=1,i
@@ -111,12 +202,11 @@ c now h is in units of cm.g.s
         tau(i)=tau(i)+rho*(r0-r(j))*0.4/6.77d-12*m
 	r0=r(j)
 12	continue
-	print*,'tau(i)',tau(i)
+c	print*,'tau(i)',tau(i)
 
 c tao: the optical depth in the vertical direction
 c tau: the optical depth in the radial direction
 
-	alfa=0.1d0
 	aaa=sqrt((4.+1.33*alfa*alfa)/(8./3.))
 	mach(i)=mach(i)*aaa
 c-----------------------------
@@ -124,13 +214,16 @@ c note: tao is dimensionless
 c n presents the number of the rings of the ADAF disk
 c-----------------------------
 11      continue
+
         r(0)=r(1)
 c       r(n+1)=r(n)/2.
-	r(n+1)=2.d0
+	    r(n+1)=2.d0
 
 
+        ! biggest loop, goes through radial structure?
+        ! ==============================================
         do 20 i=1,n
- 	print*,i
+        print*,i
 
         cs=sqrt(1.d0/beta*ru*(ti(i)/mui+te(i)/mue))
         omigak=1./sqrt(r(i))/(r(i)-2.d0)
@@ -143,6 +236,9 @@ c now transfer them form c=G=M=1 units to cgs units
 
         taoes=rhorho*hh*0.4d0
         s=taoes+taoes*taoes
+
+c	print*,cs,omigak,h,hh,rhorho,taoes,s
+c	stop
 
 c the first, the breamsstrahlung radiation
 
@@ -161,25 +257,37 @@ c the first, the breamsstrahlung radiation
 
         qbr=5.3d+25*rhorho*rhorho*fseta/mue/mue
 
-c	qbr=0.d0
+c	print*,hh,rhorho,setae,setai
+c	stop
+
+
+c *** The statement "qbr=0" below must be commented out when focused on the 
+c Comptonization of Syn. photons. To do this I introduced qbreset variable which is 
+c read from stdinput. 
+        if (qbreset .eq. 1.) then
+		qbr=0.d0
+	endif
 
 c------------------------------------------------------------------
 c the folowing calculate the luminosity at given frequency nu(j)  |
 c emissioned from per accretion disk ring within r(i-1) --> r(i)  |
 c------------------------------------------------------------------
-
-        do 30 j=1,80
-        nnu(j)=10.d0**(11.5+0.13d0*j)
-
+c second big loop, goes through frequencies
+c
+        do 30 j=1,nvmax
+! the value of dlog(nu) below must match the value of nvmax (number of
+! steps in SED)
+c *** previously was nnu(j)=10.d0**(10.1+0.15d0*j) 
+        nnu(j)=10.d0**(9.0+0.12d0*j)	!----------------------(8)------------------
 c now we consider the motion and the gravitational redshift
         if(mach(i)*cs.ge.1.) then
           redshift=9.d-1
-          print*,'mach*cs > 1!', mach(i)
+c          print*,'mach*cs > 1!', mach(i)
         else
           redshift=sqrt(1.-2./r(i))*(1.-mach(i)*cs*mach(i)*cs)
         endif
-     
-c	redshift=1.d0
+
+	redshift=1.d0
         nu(j)=nnu(j)/redshift
 c nu(j) present the 'unredened' frequency
 
@@ -192,6 +300,14 @@ c       bnu=1.47d-47*nu(j)*nu(j)*nu(j)/(dexp(4.8d-11*nu(j)/te(i))-1.d0)
 	bnu=1.47d-47*nu(j)*nu(j)*nu(j)/((dexp(4.8d-11*nu(j)/te(i)/3.d0))
      $		**3.d0-1.d0)
         endif
+
+c now calculate the bremstrahlung. gaunt factor
+c       if(2.08d+10/nu(j)*te(i).lt.1.d0) then
+c       gaunt=sqrt(3./3.1416d0*4.8d-11/nu(j)/te(i))
+c       else
+c       gaunt=4.8d-11/te(i)*sqrt(3.)/3.1416*
+c    $          log(4./1.781*2.08d10*te(i)/nu(j))
+c       endif
 
 c now calculate the bremstrahlung. gaunt factor
  	g1=sqrt(3./3.1416d0*4.8d-11/nu(j)/te(i))
@@ -226,7 +342,7 @@ c second, the synchrotron radiation
         qiasy=33.33482155d-6*rhorho*nu(j)*fxx/fk2/mue
 c consider the radiation transfer
         qianu=qiabr+qiasy
-	
+
         kapa=qianu/4.d0/3.1416/bnu
         taonux=sqrt(3.1416)/2.*kapa*hh
 c here, taonux denotes taonu star
@@ -241,8 +357,14 @@ c from per unit surface of the disk
      $          6.*taonux*taonux+4.*sqrt(3.)*taonux**3.d0)
 	endif
 
-c transfer it to per ring the disk
 
+c	write(*,'(A,8e12.4)') 'fnu', nu(j),fk2,fxx,xx,qiabr,bnu,rhorho
+
+
+c Transfer it to per ring the disk
+c This breaks the independence between loop through the disk,
+c since r[i] depends on r[i-1]
+c
         sigma1=3.1416*((r(i-1)+r(i))**2.d0/4.d0-(r(i)+r(i+1))
      $          **2.d0/4.d0)/(6.77*6.77d-24)*m*m
         sigma2=3.1416*(r(i)*r(i)-r(i+1)*r(i+1))/(6.77*6.77d-24)*m*m
@@ -252,13 +374,13 @@ c transfer it to per ring the disk
 c-------------------------------------------------------------------
 c the following integration calculate the comptonization spectrum  |
 c-------------------------------------------------------------------
-        if(j.ge.5.and.j.le.70) then
 
-	  eps=2.d-2
+      if(j.ge.jmin .and. j.le.(nvmax-10)) then
+	  eps=1.d-2
+	  fup=8.d+1		!-----------------------------(9)-----------------
+	  flo=1.0d0*(1.+1.d-2)
 
-	  fup=8.d+1
-	  flo=1.d0*(1.+1.d-2)
-c here fup, flo denotes the Lolentz factor of electrons
+c here fup, flo denotes the Lorentz factor of electrons
 
           call simps2(flo,fup,eps,kflag,n,sum,
      $		rhorho,hh,setae,setai,fk2,nu(j),r(i),tau(i))
@@ -273,18 +395,24 @@ c	print*,nulu(j),f(j),nu(j),sigma(i)
 	nulu(j)=nulu(j)+(nu(j)*f(j)+nu(j)*sum*2.*sigma(i))
      $          *redshift**2.d0
 
+	su(j)=su(j)+nu(j)*f(j)
+
 	ssum(j)=sum*1.
 30      continue
+! end of big loop over frequencies
+!
 
 c---------------------------------------------------
 c the following calculate the second componization |
 c---------------------------------------------------
-c 	goto 20
+	if(jmin .ge. nvmax)  goto 20
 
-	do 34 jj=5,70
+!$OMP PARALLEL DO PRIVATE(jj,sum2) SHARED(sssum) 
+!$OMP& REDUCTION(+:nulu2)
+	do 34 jj=jmin,nvmax
 c       call simp2(1.01d0,6.d+1,0.2d0,sum2,
 c    $		rhorho,hh,setae,jj,nu,ssum)
-	call simp2(1.01d0,8.d+1,0.2d0,sum2,
+	call simp2(flo,fup,0.2d0,sum2,
      $          rhorho,hh,setae,jj)
 
 	nulu2(jj)=nulu2(jj)+nu(jj)*sum2*2.*sigma(i)
@@ -292,6 +420,7 @@ c    $		rhorho,hh,setae,jj,nu,ssum)
 
  	sssum(jj)=sum2*1.
 34	continue
+!$ OMP END PARALLEL DO
 
 	do 134 l=1,200
 	ssum(l)=sssum(l)
@@ -300,9 +429,12 @@ c---------------------------------------------------
 c the following calculate the third comptonization |
 c---------------------------------------------------
 
-c	goto 20
-	do 35 jj=10,80
-	call simp2(1.01d0,8.d+1,0.2d0,sum3,
+!$OMP PARALLEL DO PRIVATE(jj,sum3) SHARED(ssssum) 
+!$OMP& REDUCTION(+:nulu3)
+	do 35 jj=jmin+5,nvmax
+c       call simp2(1.01d0,6.d+1,0.2d0,sum3,
+c    $          rhorho,hh,setae,jj,nu,sssum)
+	call simp2(flo,fup,0.2d0,sum3,
      $          rhorho,hh,setae,jj)
 
         nulu3(jj)=nulu3(jj)+nu(jj)*sum3*2.*sigma(i)
@@ -310,6 +442,8 @@ c	goto 20
 
  	ssssum(jj)=sum3*1.
 35      continue
+!$ OMP END PARALLEL DO
+
 	do 135 l=1,200
         ssum(l)=ssssum(l)
 135     continue
@@ -317,15 +451,21 @@ c---------------------------------------------------
 c the following calculate the fourth comptonization |
 c---------------------------------------------------
 
-c	goto 20
-        do 36 jj=20,80
-	call simp2(1.01d0,8.d+1,0.2d0,sum4,
+!$OMP PARALLEL DO PRIVATE(jj,sum4) SHARED(sssssum) 
+!$OMP& REDUCTION(+:nulu4)
+        do 36 jj=jmin+15,nvmax
+c       call simp2(1.01d0,8.d+1,0.2d0,sum4,
+c     $          rhorho,hh,setae,jj,nu,ssssum)
+	call simp2(flo,fup,0.2d0,sum4,
      $          rhorho,hh,setae,jj)
 
         nulu4(jj)=nulu4(jj)+nu(jj)*sum4*2.*sigma(i)
      $          *redshift**2.d0
  	sssssum(jj)=sum4*1.
 36      continue
+!$ OMP END PARALLEL DO
+
+c	print*,'nulu4'
 	do 136 l=1,200
         ssum(l)=sssssum(l)
 136     continue
@@ -333,15 +473,18 @@ c---------------------------------------------------
 c the following calculate the fiveth comptonization |
 c---------------------------------------------------
 
-c       goto 20
-        do 37 jj=20,80
-        call simp2(1.01d0,8.d+1,0.2d0,sum5,
+!$OMP PARALLEL DO PRIVATE(jj,sum5) SHARED(ssuumm) 
+!$OMP& REDUCTION(+:nulu5)
+        do 37 jj=jmin+15,nvmax
+        call simp2(flo,fup,0.2d0,sum5,
      $          rhorho,hh,setae,jj)
 
         nulu5(jj)=nulu5(jj)+nu(jj)*sum5*2.*sigma(i)
      $          *redshift**2.d0
  	ssuumm(jj)=sum5*1.
 37      continue
+!$ OMP END PARALLEL DO
+
 	do 137 l=1,200
         ssum(l)=ssuumm(l)
 137     continue
@@ -349,11 +492,12 @@ c---------------------------------------------------
 c the following calculate the sixth comptonization |
 c---------------------------------------------------
 
-c       goto 20
-        do 38 jj=25,80
+!$OMP PARALLEL DO PRIVATE(jj,sum6) SHARED(ssssss) 
+!$OMP& REDUCTION(+:nulu6)
+        do 38 jj=jmin+20,nvmax
 c       call simp2(1.01d0,8.d+1,0.2d0,sum6,
 c    $          rhorho,hh,setae,jj,nu(jj),ssuumm(j))
-	call simp2(1.01d0,8.d+1,0.2d0,sum6,
+	call simp2(flo,fup,0.2d0,sum6,
      $          rhorho,hh,setae,jj)
 
         nulu6(jj)=nulu6(jj)+nu(jj)*sum6*2.*sigma(i)
@@ -361,6 +505,8 @@ c    $          rhorho,hh,setae,jj,nu(jj),ssuumm(j))
 
  	ssssss(jj)=sum6*1.
 38      continue
+!$ OMP END PARALLEL DO
+
 	do 138 l=1,200
         ssum(l)=ssssss(l)
 138     continue
@@ -369,39 +515,75 @@ c---------------------------------------------------
 c the following calculate the seventh comptonization |
 c---------------------------------------------------
 
-c       goto 20
-        do 39 jj=40,80
-        call simp2(1.01d0,8.d+1,0.2d0,sum7,
+!$OMP PARALLEL DO PRIVATE(jj,sum7) REDUCTION(+:nulu7)
+        do 39 jj=jmin+35,nvmax
+        call simp2(flo,fup,0.2d0,sum7,
      $          rhorho,hh,setae,jj)
 
         nulu7(jj)=nulu7(jj)+nu(jj)*sum7*2.*sigma(i)
      $          *redshift**2.d0
 
 39      continue
+!$ OMP END PARALLEL DO
+
 
 20      continue
+!$ OMP END PARALLEL DO
+! end of big loop over radial structure
+!
 
-        do 40 k=1,80
 
+	totlu=0.d0
+        do 40 k=1,nvmax
 	write(23,50) log10(nnu(k)),log10(nulu(k)+nulu2(k)
      $		+nulu3(k)+nulu4(k)+nulu5(k)+nulu6(k)+nulu7(k))
 c     $			-log10(4.*3.1416*distance**2.)
+	write(24,50) log10(nnu(k)),log10(su(k))
 40      continue
 50      format(2e15.6)
 
+	Do k=2,nvmax
+	totlu=totlu+(nulu(k)+nulu2(k)+nulu3(k)+nulu4(k)+nulu5(k)
+     $		+nulu6(k)+nulu7(k))*log(nnu(k)/nnu(k-1))
+	end do
+	print*,'the total luminosity is: ',totlu
+
         END
+
+
+
+
+
+
+
+
+
+
 
 	subroutine fls(x,y1,y2)
 	implicit real*8(a-h,o-z)
+	common /newnew/y3,y4
 c x: the velocity; y: the frequency
 c the following low and upper limits are very important to clculate the
 c  flux of Comptonzization of, espessially, the second Comptonization
 c       y1=4.d+13
 c       y2=2.d+15
- 	y1=5.d+11
- 	y2=3.d+13
+
+c *** Now y1 and y2 are taken from stdinput
+	y1=y3	!----------------------------10-------------------
+ 	y2=y4
+
         return
         end
+
+
+
+
+
+
+
+
+
 
 
         function f(x,y,rhorho,hh,setae,setai,fk2,nu,radaf,tau)
@@ -628,6 +810,17 @@ c now `2` moved out of this subrotine
 
         END
 	
+
+
+
+
+
+
+
+
+
+
+
 	subroutine simp(a,b,n,s,hh,r,tau,nunu)
         implicit real*8(a-h,o-z)
 	dimension repr(200),reprr(200),reph(200),emis(200),tau2(200)
@@ -640,6 +833,11 @@ c now `2` moved out of this subrotine
         s=(b-a)*s/float(3*n)
         return
         end
+
+
+
+
+
 
         function f2(x,hh,radaf,tau,nunu)
 c here small 'r' denotes the location in ADAF
@@ -721,6 +919,15 @@ c	pause
         end
 
 
+
+
+
+
+
+
+
+
+
 	subroutine simps2(a,b,eps,kflag,n,sum,rhorho,
      $		hh,setae,setai,fk2,nu,radaf,tau)
 	implicit real*8(a-h,o-z)
@@ -757,6 +964,12 @@ c  111111111111
 	return
 	end
 
+
+
+
+
+
+
 	subroutine simps1(x,eps,kflag,n1,s,
      $		rhorho,hh,setae,setai,fk2,nu,radaf,tau)
 	implicit real*8(a-h,o-z)
@@ -785,6 +998,10 @@ c 222222222222222
 	kflag=kflag+1
 	return
 	end
+
+
+
+
 
 	function mbsl4(n,x)
         double precision mbsl4,x,mbsl3
@@ -934,7 +1151,23 @@ C IT IS CORRECT!!!!!!!!!!!!!!!
         return
         end
 
-c 	SUBROUTINE SIMP2(A,B,EPS,SUM,rhorho,hh,setae,j,nu,ssum)
+
+
+
+
+
+
+
+
+
+
+
+
+! This routine is called several times furing the Comptonization.
+! It calls FCT several times.
+! • the only variables that change between calls in the IC-calculation
+!   are SUM and J
+! 
 	SUBROUTINE SIMP2(A,B,EPS,SUM,rhorho,hh,setae,j)
         implicit real*8(a-h,o-z)
 c	double precision nu,ssum
@@ -994,6 +1227,10 @@ c       FA=FCT(A,rhorho,hh,setae,j,nu,ssum)
         END
 
 
+
+
+
+
 c	function fct(gam,rhorho,hh,setae,jj,nu,ssum)
  	function fct(gam,rhorho,hh,setae,jj)
         implicit real*8(a-h,o-z)
@@ -1021,7 +1258,7 @@ c	print*,ssum(40),nu(140)
 	if(nu(i).lt.1.d0) goto 81
 	omi=nu(jj)/mc2h
 	be=sqrt(1.-1./gam/gam)
-	
+
 c 	if(gam*omip(i).lt.0.01d0) then
 c	aomi=4./3.*gam*gam*omip(i)
 c 	else
@@ -1038,7 +1275,6 @@ c now use 2.12 to calculate aomi
              aomi=(1.+4./3.*be*be-omip(i))*omip(i)
           endif
         else
-
           call lar2(100,80,1,omip(i),gam,a2,b2,c2,z2)
           aomi=z2(1)
 
@@ -1128,7 +1364,7 @@ c     $          -1./2./(1+2*gam*omip(i))/(1+2*gam*omip(i)))
 
 	sig=sig+delomp*p*omi/omip(i)*ssum(i)*pro1
 
-91	continue        
+91	continue
 81	taoes=0.4*rhorho*hh
 
         fgam=gam*gam*(5.93d+9/te)/mbsl4(2,5.93d+9/te)*(1.-1./gam/gam)
@@ -1139,6 +1375,14 @@ c	print*,'fct=',fct,jj,pro1
 	RETURN
 
         END
+
+
+
+
+
+
+
+
 
 	SUBROUTINE SIMP3(A,B,EPS,SUM)
         implicit real*8(a-h,o-z)
@@ -1195,6 +1439,14 @@ c	print*,'fct=',fct,jj,pro1
 6       RETURN
         END
 
+
+
+
+
+
+
+
+
 	function fct3(x)
         implicit real*8(a-h,o-z)
 	fct3=(1.-4./x-8./x/x)*log(1.+x)+0.5d0+8./x-1./2./(1.+x)/(1.+x)
@@ -1223,6 +1475,9 @@ c	print*,'fct=',fct,jj,pro1
         return
         end
 
+
+
+
 	function f3(xx,omip1,gam1)
         implicit real*8(a-h,o-z)
 c	romip=3./8./gam1/omip1*log(4.*gam1*omip1)
@@ -1243,6 +1498,10 @@ c	romip=3./8./gam1/omip1*log(4.*gam1*omip1)
 	f3=coef*(term1+term2+term3)/2.
 	return
 	end
+
+
+
+
 
 	SUBROUTINE LAR(N,M,L,X,Y,A,B,C,Z)
 	implicit real*8(a-h,o-z)
@@ -1285,6 +1544,10 @@ c	romip=3./8./gam1/omip1*log(4.*gam1*omip1)
 8       Z(K)=W
         RETURN
         END
+
+
+
+
 
 	SUBROUTINE LAR2(N,M,L,X,Y,A,B,C,Z)
         implicit real*8(a-h,o-z)
