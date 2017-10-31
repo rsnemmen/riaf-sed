@@ -14,7 +14,7 @@ FFLAGS = -O
 
 all: dynamics spectrum ssd ssd_alone
 
-dynamics: dynamics_new.f
+dynamics: dynamics.f
 	$(FC) $(FFLAGS) -ffpe-trap=invalid,zero $^ -o $@
 
 spectrum: spectrum.f

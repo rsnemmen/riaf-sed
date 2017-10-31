@@ -15,9 +15,9 @@ C   IS ALSO INCLUDED, THE PARAMETER IS ``DELTA''
 	double precision m,mui,mue,mbsl4
 	common alfa,beta,dotm0,rout,p0,gamai,ru,
      $          sl0,m,mui,mue,delta,rtran
-	open(41,file='1.dat')
-	open(42,file='hottem1.dat')
-	open(14,file='hot1.dat')
+	open(41,file='x.dat')
+	open(42,file='hottem.dat')
+	open(14,file='hot.dat')
 
 	ru=9.2d-14
 	mmm=0
@@ -25,42 +25,89 @@ C   IS ALSO INCLUDED, THE PARAMETER IS ``DELTA''
 c --------------------------------
 c here, ru is k/M_mu
 c---------------------------------
-        gamai=4./3.d0
-	m=1.d8
+c	print *,'Adiabatic index gamma:'
+	read(*,*) gamai
+c	print *,'#gama',gamai
+c        gamai=5./3.d0
+
+c	print *,'Black hole mass (in Solar masses):'
+	read(*,*) m
+c	print *,'#m',m
+c	m=10.d0
 
 	mui=1.24d0
 	mue=1.13d0
-	beta=0.5d0
 
-	alfa=1.d-1
-	delta=1.d-3
+c ratio of gas to total pressure
+c	print *,'beta:'
+	read(*,*) beta
+c	print *,'#beta',beta
+c	beta=0.9d0
+
+c	print *,'alpha:'
+	read(*,*) alfa
+c	print *,'#alfa',alfa
+c	alfa=3.d-1
+
+c Fraction of turbulent dissipation that directly heats electrons
+c	print *,'delta:'
+	read(*,*) delta 
+c	print *,'#delta',delta
+c	delta=5.d-1
 
 	dotme=3.44d-15*m
 c  dotme is the Eddington accretion rate
 
-	dotm0=dotme*1.0d-4
+c	print *,'Mdot_out (Eddington units):'
+	read(*,*) dotm0
+c	print *,'#dotm',dotm0
+	dotm0=dotme*dotm0
 c dotm0 is the accretion rate at the outer boundary
-	rout=10000.d0
+
+c	print *,'R_out (units of R_S):'
+	read(*,*) rout
+	rout=2.*rout
+c	print *,'#rout',rout
+c	rout=600.d0
 c rout is the outer boundary
+
+c	print *,'p_wind ("strength of wind"):'
+	read(*,*) pp0
+c	print *,'#p',pp0
 	p0=0.0d0
-	pp0=0.0d0
+c	pp0=0.55d0
 c  pp0 describes the strength of the outflow
 	sint=0.d0
+	
+c	print *,' '
+c	print *,'Boundary conditions:'
+c	print *,'====================='
+c	print *,'T_i (ion temperature):'
+	read(*,*) ti
+c	print *,'#ti',ti
+c	ti=5.d+9
 
-	ti=1.d+9
-	te=5.0d+8
+c	print *,'T_e (electron temperature):'
+	read(*,*) te
+c	print *,'#te',te
+c	te=1.8d+9
 
 	cs=sqrt(ru/beta*(ti/mui+te/mue))
-	vcs=5.d-1
+
+c	print *,'v_R/c_s (radial velocity/sound speed):'
+	read(*,*) vcs
+c	print *,'#vcs',vcs
+c	vcs=3.d-1
 
 c you need to adjust the boundary conditions ti, te, and vcs (the ratio
 c between the radial velocity and local sound speed) to get a solution
-	print*,'sl0=?'
+c	print*,'sl0=? (eigenvalue of the problem)'
 	read(*,*) sl0
+c	print *,'#sl0',sl0
 c sl0 is the eignevalue of the problem
 
 	I=2
-c Modified!
+c Added! ***
 	y(1)=rout
 c	y(1)=600.d0
 	rtran=y(1)*1.001d0
@@ -73,10 +120,10 @@ c	y(1)=600.d0
 	omiga=sout/y(1)/y(1)
 	omik=sk
 
-	print*,'omiga/omigak=',omiga/omik,sout,100/y(1)/y(1)/sk
+	print*,'# omiga/omigak=',omiga/omik,sout,100/y(1)/y(1)/sk
 	if(omiga/omik.gt.1.) then
-	   print*,'omiga/omigak > 1!!!', omiga/omik
-       	   print*,'I must let vcs increase!'
+	   print*,'# omiga/omigak > 1!!!', omiga/omik
+       	   print*,'# I must let vcs increase!'
 	   stop
 	endif
 
@@ -113,8 +160,8 @@ c	rho=-dotm0*(y(1)/rout)**p0/4./3.1416/y(1)/cs*omik/y(2)
             w3=ww/y(1)-2.*omiga
             rdomiga=w1*dy(2)+w2*(dy(3)/mue+dy(4)/mui)+w3
             if(rdomiga.gt.0.) then
-            print*,rdomiga,'$$$$$$$$$$$$$$$'
-            print*,'FAILED!!!'
+            print*,rdomiga,'# $$$$$$$$$$$$$$$'
+            print*,'# FAILED!!!'
 c           stop
             endif
 	dh=cs/omik
@@ -192,8 +239,10 @@ c     $       4./mbsl4(2,1.d0/setae)-1.d0)
 	  aaa=sqrt((4.+1.33*alfa*alfa)/(8./3.))
 	  outflow=-rho*4.*3.14*y(1)*cs/omik*y(2)/dotme/0.05
 
-	    write(*,5) y(1)/2,-y(2)/cs/aaa,log10(y(3)),
-     $	          log10(y(4)),advec,advec2
+c Modified the standard output ***
+	    write(*,*) y(1),-y(2)/cs/aaa,log10(y(3))
+     $	        ,log10(y(4)),advec,advec2,cs,dh,qn,tau,log10(slk)
+     $		,log10(ssll),bb,log10(rho)
 c    $		log10(m*rho/1.01d-63*6.77d-12**3.d0/m**3.d0)
 c the number density above is in cgs units 
  	    write(41,6) log10(y(1)/2.d0),-y(2),
@@ -252,8 +301,10 @@ c  what we observe is only half of the total emitted radiation: no!!!!
 
          Eddlum=1.3d+38*1.d+6*m*5.59d-61/m/2.03d-1*m
  11      continue
-         write(*,*) 'The total luminosity is:',sumlum/eddlum,
+         write(*,*) '# The total luminosity is:',sumlum/eddlum,
      $		sumlum/(5.59d-61/m/2.03d-1*m)
+c *** added
+     	 write(*,*) '# Run finished'
 
 
 	  if(y(1).ge.2.2d0) goto 222
@@ -282,7 +333,7 @@ c	stop
 	ssll=-alfa*cs2*y(1)/y(2)+sl0
 
 	if(ssll.lt.0.) then
-	print*,'ssll < 0 '
+	print*,'# ssll < 0 '
 	stop
 	endif
 
@@ -323,7 +374,8 @@ c--------------------------------
         else
 
         bel=1.d0*(setae+setai)/setae/setai
-        qie=2.366*20.d0/m*rho*rho*(y(4)-y(3))/mbsl4(2,1.d0/setae)
+!*** leading factor was "qie=2.366*20.d0/", now added 3/4 factor
+        qie=2.366*20.d0*0.75/m*rho*rho*(y(4)-y(3))/mbsl4(2,1.d0/setae)
      $          /mbsl4(2,1.d0/setai)*((2.*(setae+setai)**2.d0+1.)/
      $          (setae+setai)*mbsl4(1,bel)+2.*mbsl4(0,bel))
         endif
@@ -373,8 +425,9 @@ c as tt.
 c in the above, '2' is added in 2005.09.14; in the below, 13.--->14 also
 c the uppler limit of frequency in the integration is determined
 c by the bremsstrahlung emission: h \nu = k T
+c *** changed first argument of simp2 from 12d0 to 90, following Renyi's suggestion
 c	print*,setae
-	call simp2(12.d0,numax,1.d-2,sum,setae,setai,rhorho,hh,qbr)
+	call simp2(9.d0,numax,1.d-2,sum,setae,setai,rhorho,hh,qbr)
 c	print*,setae
 c	pause
 
@@ -630,7 +683,7 @@ c	taoes=taoes1
         if(etamax.gt.1.) then
         jm=log(etamax)/log(a)
         else
-        print*,'etamax < 1 !!!',etamax,te,nu
+        print*,'# etamax < 1 !!!',etamax,te,nu
         stop
         jm=0.d0
         endif
