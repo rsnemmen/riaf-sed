@@ -233,6 +233,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 - [x] what parameters should I change for low BH masses? cf. branch lowmass
 - [ ] parallelize shooting method in `dyn.pl`
 - [x] parallelize inverse Compton scattering in spectrum. Inserted OpenMP directives in the comptonization loops
+- [ ] OpenMP => OpenACC
 
 
 ---
@@ -242,7 +243,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 
 &nbsp;
 
-Copyright (c) 2016, [Rodrigo Nemmen](http://rodrigonemmen.com), [Feng Yuan](http://center.shao.ac.cn/fyuan/yuan.html).
+Copyright (c) 2017, [Rodrigo Nemmen](http://rodrigonemmen.com), [Feng Yuan](http://center.shao.ac.cn/fyuan/yuan.html).
 [All rights reserved](http://opensource.org/licenses/BSD-2-Clause).
 
 
