@@ -240,12 +240,11 @@ c     $       4./mbsl4(2,1.d0/setae)-1.d0)
 	  outflow=-rho*4.*3.14*y(1)*cs/omik*y(2)/dotme/0.05
 
 c Modified the standard output ***
+c the two last columns are the density and electron number density in cgs units 
 	    write(*,*) y(1),-y(2)/cs/aaa,log10(y(3))
      $	        ,log10(y(4)),advec,advec2,cs,dh,qn,tau,log10(slk)
-     $		,log10(ssll),bb,log10(rho),
-     $      log10(m*rho/1.01d-63*6.77d-12**3.d0/m**3.d0),
+     $		,log10(ssll),bb,log10(rho*6.1749d+5/m/m),
      $      log10(rho*6.1749d+5/m/m/1.67d-24/mue)
-c the number density above is in cgs units 
  	    write(41,6) log10(y(1)/2.d0),-y(2),
      $		log10(y(3)),log10(y(4)),log10(slk),log10(ssll)
      $          ,log10(tao),bb,-8.d+8/(y(1)/y(2)/0.203*m)/bb/bb
