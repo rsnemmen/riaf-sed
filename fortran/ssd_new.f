@@ -107,7 +107,7 @@ c       rs=g*m*1.d6*msun/9.d20
 
         if(kkrep.eq.0) then
 
-        do 103 i=1,repn
+        do 103 i=1,int(repn)
         read(14,*) reprr(i),rephh(i),emis(i),tau2(i)
 c emis is in units of cm.g.s
         repr(i)=reprr(i)*rs/2.
@@ -118,7 +118,7 @@ c emis is in units of cm.g.s
         endif
 
         frep=0.d0
-        do 50 i=1,repn-1
+        do 50 i=1,int(repn-1)
 
 c       ff1=reph(i)/2.*pi/(reph(i)*reph(i)/4.+(x-repr(i))**2.d0)**1.5
 

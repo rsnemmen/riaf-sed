@@ -4,7 +4,7 @@
 # You need first to compile these codes (of course).
 
 # Path to ADAF spectrum executable
-$specbin="~/work/projects/adafjet/adaf/fortran/spectrum";
+$specbin="~/science/projects/adafjet/adaf/fortran/spectrum";
 
 # For computing derivatives. Download the required library from 
 # http://search.cpan.org/~jarw/Math-Derivative-0.01/Derivative.pm
