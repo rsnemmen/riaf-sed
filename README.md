@@ -1,16 +1,9 @@
 ADAF dynamics and spectrum
 ======================
 
-Routines to compute the spectral energy distributions of radiatively inefficient accretion flows (aka RIAFs or ADAFs - advection-dominated accretion flows). The spectral code is parallelized with OpenMP.
+Routines to compute the spectral energy distributions of radiatively inefficient accretion flows (aka RIAFs or ADAFs - advection-dominated accretion flows). The spectral code is parallelized with OpenMP. The expected speedup currently is ncores/2 compared with the serial code.
 
-# Installation
-
-    cd fortran
-    make
-
-Fortran binaries located in `fortran` dir. Perl binaries in `perl` dir.
-
-## Requirements
+# Requirements
 
 - Fortran compiler (e.g., gfortran) with OpenMP support
 - Perl
@@ -22,6 +15,13 @@ How to install Perl modules:
     cpan App::cpanminus
     sudo cpan Math::Derivative
     sudo cpan Chart::Gnuplot
+
+# Installation
+
+    cd fortran
+    make
+
+Fortran binaries located in `fortran` dir. Perl binaries in `perl` dir.
 
 
 # Usage
@@ -57,7 +57,7 @@ In order to compute the corresponding models, please rename the files to `in.dat
 
 ## Example of how to run in "parallel"
 
-Here is how I usually run the ADAF models in parallel ("dumb parallelization"). I created three folders inside `adaf_code/perl` named `run01`, `run02` and `run03`. Inside each of these folders there is a parameter file `in.dat`. 
+If you are fitting a SED, you need to explore many models and combinations of parameters. Here is how I usually run the ADAF models in parallel ("dumb parallelization"). I created three folders inside `adaf_code/perl` named `run01`, `run02` and `run03`. Inside each of these folders there is a parameter file `in.dat`. 
 
 I open one terminal with three tabs corresponding to each folder (or three terminals). Then I edit the three input files corresponding to a set of models, and finally run the program at the same time in each terminal. Hence why "dumb parallelization".
 
@@ -95,6 +95,8 @@ Input files for spectrum.f must match the output of dynamics.f: e.g. 1.dat and h
  - omiga: ang. mom.
  
 ## Useful advice 
+
+If you want to inspect the behaviour of the dynamical solution,  have a look at the log file `out` which you define in the 38th line of `in.dat`. Every line corresponds to a different cylindrical radius shell of the RIAF, with the first column listing the radius (in units of M) and the others giving physical quantities.
  
 Guideline to find the correct physical solution:
 When running the code I should always look for the solutions which have a smooth behavior of v_R(R), the Mach number is >1 at the inner region (have a sonic point) and for which v_R decreases as R increases. 
@@ -128,7 +130,8 @@ For example: \dot{M}=0.1\dot{M_Edd}, rout=100 r_g => T_i=15e9K, T_e=8e9K, vcs=0.
 
 ### Original codes (Feng's group)
 
-**./bak/dynamics.f, /bak/spectrum.f, /bak/newsp.f, /bak/ssd.f**
+`./bak/dynamics.f`, `/bak/spectrum.f`, `/bak/newsp.f`, `/bak/ssd.f`
+
 Original codes sent by Feng.
 
 ### Core numerical routines  
@@ -233,7 +236,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 - [x] what parameters should I change for low BH masses? cf. branch lowmass
 - [ ] parallelize shooting method in `dyn.pl`
 - [x] parallelize inverse Compton scattering in spectrum. Inserted OpenMP directives in the comptonization loops
-- [ ] OpenMP => OpenACC
+- [ ] OpenACC version
 
 
 ---
@@ -243,7 +246,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 
 &nbsp;
 
-Copyright (c) 2017, [Rodrigo Nemmen](http://rodrigonemmen.com), [Feng Yuan](http://center.shao.ac.cn/fyuan/yuan.html).
+Copyright (c) 2019, [Rodrigo Nemmen](http://rodrigonemmen.com), [Feng Yuan](http://center.shao.ac.cn/fyuan/yuan.html).
 [All rights reserved](http://opensource.org/licenses/BSD-2-Clause).
 
 
