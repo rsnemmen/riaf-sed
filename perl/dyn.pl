@@ -18,7 +18,7 @@
 # - test for smoothness nearby the sonic point
 
 # Path to ADAF dynamics executable
-$dynbinary="~/work/projects/adafjet/adaf/fortran/dynamics";
+$dynbinary="~/science/projects/adafjet/adaf/fortran/dynamics";
 
 # For computing derivatives. Download the required library from 
 # http://search.cpan.org/~jarw/Math-Derivative-0.01/Derivative.pm

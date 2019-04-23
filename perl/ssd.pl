@@ -5,7 +5,7 @@
 # compile these codes (of course).
 
 # Path to ADAF spectrum executable
-$specbin="~/work/projects/adafjet/adaf/fortran/ssd_alone";
+$specbin="~/science/projects/adafjet/adaf/fortran/ssd_alone";
 
 
 # Needed so that I can plot with Gnuplot
