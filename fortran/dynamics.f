@@ -273,7 +273,8 @@ c	print*,y,rho
            inform=12
            mmm=1
            print*,y
-           pause
+c          pause
+           write(*,*) 'something went wrong, line 277'
         endif
 
 
@@ -532,7 +533,7 @@ c reph(i), repr(i): the height and radius of a point in ADAF
 	repn=10
 
 	if(kkrep.eq.0) then
-	do 103 i=1,repn
+	do 103 i=1,int(repn)
 	read(14,*) repr(i),reph(i),emis(i),tau2(i)
 c emis is in units of cm.g.s 
 
@@ -543,7 +544,7 @@ c emis is in units of cm.g.s
 	endif
 
 	frep=0.d0
-	do 50 i=1,repn-1
+	do 50 i=1,int(repn-1)
 c	ff1=reph(i)/2.*pi/(reph(i)*reph(i)/4.+(x-repr(i))**2.d0)**1.5
 
 	ff1=reph(i)/2.*pi/(reph(i)*reph(i)/4.+repr(i)*repr(i)
@@ -930,7 +931,7 @@ c	taoes=taoes1
 
 	subroutine mers(n,inform,h,eps,y,dy,w,qn,qd,tau,sint)
         implicit real*8(a-h,o-z)
-        dimension y(1),dy(1),w(4,1),a(4),b(4),c(4)
+        dimension y(n),dy(n),w(4,1),a(4),b(4),c(4)
         data a(1),a(2),a(3),a(4)/0.3333333333,0.16666666667,0.375,2.0/,
      $    b(1),b(2),b(3),b(4)/1.d0,0.444444444444,0.9375d0,8.d0/,
      $    c(1),c(2),c(3),c(4)/0.d0,0.25d0,-0.2d0,-1.125d0/
