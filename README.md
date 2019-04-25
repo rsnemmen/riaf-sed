@@ -237,6 +237,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 - [ ] parallelize shooting method in `dyn.pl`
 - [x] parallelize inverse Compton scattering in spectrum. Inserted OpenMP directives in the comptonization loops
 - [ ] OpenACC version
+- [ ] port the core fortran code to C and prettify it
 
 
 ---

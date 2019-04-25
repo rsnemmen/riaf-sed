@@ -11,3 +11,6 @@ Main author of the code. Wrote the Fortran solvers for the radial structure (`dy
 - Wrote tutorial on how to use the code
 - Wrote the parallel version of the radiative transfer solver with OpenMP
 
+# Contributing
+
+If you have ideas on how to improve this project, feel free to contribute. When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change. If you submit a pull request, please include a detailed explanation of the changes you are proposing.
