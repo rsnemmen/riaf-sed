@@ -8,6 +8,7 @@ These routines use a semi-analytical approach to treat the radiation from the RI
 The bottleneck of the calculations is in solving the dynamical structure of the flow and computing the inverse Compton radiation. The radiative transfer calculations take advantage of parallel architectures with OpenMP. The expected speedup is `ncores/2` compared with the serial code, where `ncores` is the number of CPU cores in your machine.
 
 ![The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).](./m87sed.png) 
+Figure: The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).
 
 # Requirements
 
