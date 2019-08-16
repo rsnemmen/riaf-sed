@@ -87,7 +87,7 @@ You are morally obligated to cite the following papers in any scientific literat
 2. [Nemmen, R. S.; Storchi-Bergmann, T. & Eracleous, M.
 Spectral models for low-luminosity active galactic nuclei in LINERs: the role of advection-dominated accretion and jets 
 MNRAS, 2014 , 438 , 2804](http://mnras.oxfordjournals.org/content/438/4/2804)
-3. [Yuan, F.; Zdziarski, A. A.; Xue, Y.; Wu, X. Modeling the Hard States of XTE J1550-564 during Its 2000 Outburst. ApJ, 659, 541](https://ui.adsabs.harvard.edu/abs/2007ApJ...659..541Y/abstract)
+3. [Yuan, F.; Zdziarski, A. A.; Xue, Y.; Wu, X. Modeling the Hard States of XTE J1550-564 during Its 2000 Outburst. ApJ, 2007, 659, 541](https://ui.adsabs.harvard.edu/abs/2007ApJ...659..541Y/abstract)
 
 
 
