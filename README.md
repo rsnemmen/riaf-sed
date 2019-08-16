@@ -1,16 +1,21 @@
-ADAF dynamics and spectrum
-======================
+Radiatively inefficient accretion flow: Dynamics and spectrum
+==================================================
 
-Routines to compute the spectral energy distributions of radiatively inefficient accretion flows (aka RIAFs or ADAFs - advection-dominated accretion flows). The spectral code is parallelized with OpenMP. The expected speedup currently is ncores/2 compared with the serial code.
+This is a set of routines to compute the spectral energy distributions (SEDs) of radiatively inefficient accretion flows (RIAFs) around black holes. This should be useful for researchers interested in modeling the electromagnetic radiation from e.g. low-luminosity active galactic nuclei, X-ray binaries and other astrophysical applications. A RIAF consists of a geometrically thick, optically thin accretion flow filled with a very hot, two-temperature gas with the ion temperatures reaching 1E12 K. 
+
+These routines use a semi-analytical approach to treat the radiation from the RIAF (also called sometimes advection-dominated accretion flows, ADAFs) in which the accretion flow is considered stationary assuming an α-viscosity and a pseudo-Newtonian gravity, and the radiative transfer is treated in considerable detail, taking into account synchrotron, inverse Compton scattering and bremsstrahlung processes as appropriate for hot plasmas (e.g. [Nemmen et al. 2006](https://iopscience.iop.org/article/10.1086/500571); [Nemmen et al. 2014](https://academic.oup.com/mnras/article/438/4/2804/2907740)).
+
+The bottleneck of the calculations is in solving the dynamical structure of the flow and computing the inverse Compton radiation. The radiative transfer calculations take advantage of parallel architectures with OpenMP. The expected speedup is `ncores/2` compared with the serial code, where `ncores` is the number of CPU cores in your machine.
+
+![The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).](./m87sed.png) 
 
 # Requirements
 
 - Fortran compiler (e.g., gfortran) with OpenMP support
-- Perl
-- Gnuplot
-- Perl modules: `Math::Derivative`, `Chart::Gnuplot`
+- Perl with modules `Math::Derivative`, `Chart::Gnuplot`
+- Optional: Gnuplot for diagnostic plots
 
-How to install Perl modules:
+To install the required Perl modules use the commands:
 
     cpan App::cpanminus
     sudo cpan Math::Derivative
@@ -18,22 +23,31 @@ How to install Perl modules:
 
 # Installation
 
+To compile the routines, please clone this repository in your machine and then issue these commands inside the repo folder:
+
     cd fortran
     make
 
-Fortran binaries located in `fortran` dir. Perl binaries in `perl` dir.
+The Fortran binaries will be located inside the `fortran` dir. The Perl binaries are in the `perl` dir.
+
+# Model description
+
+These routines use a semi-analytical approach to treat the radiation from the RIAF (also called sometimes advection-dominated accretion flows, ADAFs) in which the accretion flow is considered stationary assuming an α-viscosity and a pseudo-Newtonian gravity, and the radiative transfer is treated in considerable detail, taking into account synchrotron, inverse Compton scattering and bremsstrahlung processes as appropriate for hot plasmas (e.g. [Nemmen et al. 2006](https://iopscience.iop.org/article/10.1086/500571); [Nemmen et al. 2014](https://academic.oup.com/mnras/article/438/4/2804/2907740)).
+
+Our model for the RIAF emission follows [Nemmen et al. (2014)](https://academic.oup.com/mnras/article/438/4/2804/2907740). We now describe the main parameters of this model. RIAFs are usually characterized by the presence of outflows or winds, which prevent a considerable fraction of the gas that is available at large radii from being accreted onto the black hole (see Yuan & Narayan 2014 for a review). In order to take this mass-loss into account, we introduce the parameter *s* to describe the radial variation of the accretion rate as $\dot{M}(R) = \dot{M}_{\rm o} \left( R/R_{\rm o} \right)^{s}$ (or $\rho(R) \propto R^{-3/2+s}$) where $\dot{M}_{\rm o}$ is the rate measured at the outer radius $R_{\rm o}$ of the RIAF (Blandford & Begelman 1999). The other parameters that describe the RIAF solution are the black hole mass *M*; the viscosity parameter *alpha*; the modified plasma *beta* parameter, defined as the ratio between the gas and total pressures; the fraction of energy dissipated via turbulence that directly heats electrons *delta*; and the adiabatic index *gamma*.
+
 
 
 # Usage
 
-**Setup**
+## Model setup
 
 - edit `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl` and adjust the path to the executables (variables `$dynbinary`, `$specbin` and `$specbin`, respectively)
 - cd to the directory that will contain the SED
 - edit the input file `in.dat` with the desired model parameters
 - include in this directory the following files: `aomi*dat`, `romi*dat`
 
-**Compute a model SED**
+## Compute SED
 
 1. run `perl/dyn.pl` to compute ADAF dynamics to find physical global solution, adjusting range of eigenvalues `sl0i`,`sl0f` if required
 2. once you get a good (physical) global solution in step 1, run `perl/spectrum.pl` to generate ADAF SED 
@@ -55,13 +69,13 @@ In order to compute the corresponding models, please rename the files to `in.dat
 
 
 
-## Example of how to run in "parallel"
+## Doing many model realizations "in parallel"
 
-If you are fitting a SED, you need to explore many models and combinations of parameters. Here is how I usually run the ADAF models in parallel ("dumb parallelization"). I created three folders inside `adaf_code/perl` named `run01`, `run02` and `run03`. Inside each of these folders there is a parameter file `in.dat`. 
+If you are fitting a SED, you need to explore many models and combinations of parameters. Unfortunately, we do not have yet any MCMC fitting that does this automatically for you. Here is how I usually run the ADAF models in parallel ("dumb parallelization"). I created three folders inside `adaf_code/perl` named `run01`, `run02` and `run03`. Inside each of these folders there is a parameter file `in.dat`. 
 
 I open one terminal with three tabs corresponding to each folder (or three terminals). Then I edit the three input files corresponding to a set of models, and finally run the program at the same time in each terminal. Hence why "dumb parallelization".
 
-The image below shows a screenshot of OS X during a typical parallel run. This is especially useful in multi-core/multi-processor architectures since Feng's code is serial and it would take a (perhaps) considerable amount of effort to make it parallel.
+The image below shows a screenshot of OS X during a typical parallel run. 
 
 ![OS X running code in parallel](./osxparallel.png =300x) 
 
@@ -77,145 +91,19 @@ The guideline for setting the ADAF outer boundary conditions is:
 Please refer to the Appendix A of my [PhD thesis](http://hdl.handle.net/10183/16325) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta) for more information on the BC choices.
 
 
+# Citation
+
+You are morally obligated to cite the following papers in any scientific literature that results from use of any part of this code:
+
+1. [Yuan, F.; Cui, W. & Narayan, R. An Accretion-Jet Model for Black Hole Binaries: Interpreting the Spectral and Timing Features of XTE J1118+480. ApJ, 2005 , 620 , 905](https://iopscience.iop.org/article/10.1086/427206)
+2. [Nemmen, R. S.; Storchi-Bergmann, T. & Eracleous, M.
+Spectral models for low-luminosity active galactic nuclei in LINERs: the role of advection-dominated accretion and jets 
+MNRAS, 2014 , 438 , 2804](http://mnras.oxfordjournals.org/content/438/4/2804)
+3. [Yuan, F.; Zdziarski, A. A.; Xue, Y.; Wu, X. Modeling the Hard States of XTE J1550-564 during Its 2000 Outburst. ApJ, 659, 541](https://ui.adsabs.harvard.edu/abs/2007ApJ...659..541Y/abstract)
 
 
 
-# More
 
-Eigenvalue parameter is usually between 1 and 3
-
-Input files for spectrum.f must match the output of dynamics.f: e.g. 1.dat and hot*.dat
-
- - slk: Keplerian specific angular momentum
- - ssll: ADAF specific ang. mom.
- - tao: vertical optical depth
- - bb: magnetic field strength
- - qn: cooling rate per unit volume 
- - omigak: Keplerian angular momentum
- - omiga: ang. mom.
- 
-## Useful advice 
-
-If you want to inspect the behaviour of the dynamical solution,  have a look at the log file `out` which you define in the 38th line of `in.dat`. Every line corresponds to a different cylindrical radius shell of the RIAF, with the first column listing the radius (in units of M) and the others giving physical quantities.
- 
-Guideline to find the correct physical solution:
-When running the code I should always look for the solutions which have a smooth behavior of v_R(R), the Mach number is >1 at the inner region (have a sonic point) and for which v_R decreases as R increases. 
-
-Apparently the code "hangs" (stays processing for very long time) after passing the eigenvalue corresponding to the physical solution. This provides a way of automatically finding the correct solution!! Bracketing between the last valid solution and the "freezing" one.
-
-When I get lots of NaN and FAILED! results from the dynamics code for a broad range of eigenvalues given some values of the basic parameters, try changing slightly the boundary conditions. 
-
-
-## More details about setting the boundary conditions
-
-For large Rout (greater than a few thousands r_g):
-  
-* If rout~10^4r_g, we usually set vcs=0.2 or 0.3, or even 0.1; 
-* T_i is about 0.1~0.3 T_viral, with T_viral being the viral temperature.
-* T_e should be smaller than T_i. As rout is great, v_R is small, the ions and electrons have almost enough time to achieve thermal equilibrium, and so the difference between T_i and Te is small.
-
-For example: rout=10^4 r_g,  T_i~6e7K, T_e~5.9e7K,  vcs~0.2
-    
-For Rout~100 r_g:
-
-* vcs should be larger,  I usually set vcs=0.5. Feng often takes rout as a few 10^2 or 10^3 r_g. He once said it would be difficult to find the global solution if rout>=10^5 r_g.
-* you need to adjust them to have the global solution. 
-
-For example: \dot{M}=0.1\dot{M_Edd}, rout=100 r_g => T_i=15e9K, T_e=8e9K, vcs=0.5.
-
-
-# Software 
-
-## List of codes and their functions
-
-### Original codes (Feng's group)
-
-`./bak/dynamics.f`, `/bak/spectrum.f`, `/bak/newsp.f`, `/bak/ssd.f`
-
-Original codes sent by Feng.
-
-### Core numerical routines  
-
-**./fortran/spectrum_new.f
-./fortran/dynamics_new.f
-./fortran/ssd_new.f**
-  My modifications with respect to dynamics.f and newsp.f. Added parameter input via standard input, descriptions, modified standard output.
-
-```
-dyn.pl    
-│
-└───dynamics_new.f
-```
-
-**./perl/dyn.pl**
-  Given an initial range of eigenvalues, computes solutions, checks if each solution is physical and bracket the right eigenvalue automatically. This is a mix of adaf_family_manyfiles and diagnose.pl. This code tends to have the *most updated* fixes to bugs etc.
-
-```
-spectrum.pl    
-│
-└───spectrum_new.f
-```
-
-**./perl/spectrum.pl**
-  Given a dynamical solution previously computed, calculates the spectrum. The parameters must match the dyn. solution. Currently for test purposes.
-
-#### Thin disk
-
-
-```
-ssd.pl    
-│
-└───ssd_new.f
-```
-  
-**./perl/ssd.pl**
-  Opens a pipe to ssd_new.f and runs it.
-
-**./fortran/ssd_alone.f**
-  My modification of ssd.f where I discard the effect of the illumination of the thin disk by the ADAF. In other words, this code calculates the spectrum of a standard thin disk only.
-
-**./perl/ssd_alone.pl**
-  Pipes input into ssd_alone.f.
-
-### Other 
-
-**./perl/adaf.pl**  
-Opens a pipe to dynamics_new and computes the dynamics for a given set of parameters. Plots Mach number vs. R as a diagnostic of the behavior of the solution.
-
-**./perl/adaf_family.pl**
-  Opens a pipe to dynamics_new and computes a family of ADAF models, varying the eigenvalue.
-
-**./fortran/spectrum_thin.f
-./fortran/dynamics_thin.f**
-  Codes that enable the thin disk contribution. Feng recommended not to enable the thin disk inside the ADAF dynamics code, but use ssd.f to compute the thin disk spectrum.
-
-./perl/diagnose.pl
-  Given a log file from adaf.pl, runs a series of diagnostics on the resulting solution to check if it is consistent.
-  
-./perl/adaf_iterate.pl
-  Calculates a series of ADAF solutions, iterating over the eigenvalue. Detects if the solution was computed successfully (but not yet whether it is physical) or whether the user interrupted the run pressing ctrl-C. Modified from adaf_family.
-
-./perl/adaf_family_manyfiles.pl
-  Calculates several ADAF solutions for a range of eigenvalues. Instead of dumping all the solutions into one file, creates individual files for each solution. I wrote this script specifically for diagnose_batch.pl.
-
-./perl/diagnose_batch.pl
-  Runs diagnose on a bunch of output files. These output files may be generated with adaf_family_manyfiles.pl for instance.
-
-./perl/group_files.pl
-  Takes the files generated by adaf_family_manyfiles.pl and concatenates all of them into one file, separates each file by two newlines. Useful for plotting all the solution together.
-  
-./fortran/dynamics_debug.f
-./fortran/debug.f
-  For debugging purposes, especially with gdb.
-
-
-## Description of folders
-
-./tests
-  Several tests of the SED and dynamics.
-
-./perl/run*
-  Folders created to store results from simultaneous runs of the code. Useful for exploiting the capabilities of the multi-core processors. Each run of the code goes into only one core.
 
 # References
 
@@ -225,27 +113,19 @@ More details about models: [Rodrigo Nemmen's PhD thesis](http://hdl.handle.net/1
 
 Global solutions: [Manmoto et al. (1997)](http://iopscience.iop.org/article/10.1086/304817/meta); [Narayan et al. (1997)](http://iopscience.iop.org/article/10.1086/303591/meta)
 
-Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/10183/16325) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta). 
+Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/10183/16325) (in portuguese) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta). 
 
-# TODO
+# TODO 
 
-- [x] include examples of parameter files for different situations
-- [x] include comment about additional data files needed for computation
-- [x] ~~add dependency tree for executables (`romi.dat` etc)~~
-- [x] perl codes: add location of fortran binaries as additional parameter
-- [x] what parameters should I change for low BH masses? cf. branch lowmass
+By order of priority:
+
+- [ ] port the core fortran code to C and better organize it
+- [ ] add nonthermal emission
+- [ ] OpenACC version for radiative transfer
 - [ ] parallelize shooting method in `dyn.pl`
-- [x] parallelize inverse Compton scattering in spectrum. Inserted OpenMP directives in the comptonization loops
-- [ ] OpenACC version
-- [ ] port the core fortran code to C and prettify it
 
 
 ---
-
-
-&nbsp;
-
-&nbsp;
 
 Copyright (c) 2019, [Rodrigo Nemmen](http://rodrigonemmen.com), [Feng Yuan](http://center.shao.ac.cn/fyuan/yuan.html).
 [All rights reserved](http://opensource.org/licenses/BSD-2-Clause).

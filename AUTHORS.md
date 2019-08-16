@@ -2,7 +2,7 @@ Here is a list of people who contributed to this project.
 
 # [Feng Yuan](http://center.shao.ac.cn/fyuan/yuan.html)
 
-Main author of the code. Wrote the Fortran solvers for the radial structure (`dynamics.f`) and the radiative transfer (`spectrum.f`).
+Main author of the code. Wrote the original Fortran solvers for the radial structure (`dynamics.f`) and the radiative transfer (`spectrum.f`).
 
 # [Rodrigo Nemmen](http://rodrigonemmen.com)
 
