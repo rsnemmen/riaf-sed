@@ -11,6 +11,18 @@ Apparently the code "hangs" (stays processing for very long time) after passing 
 
 When I get lots of NaN and FAILED! results from the dynamics code for a broad range of eigenvalues given some values of the basic parameters, try changing slightly the boundary conditions. 
 
+## Doing many model realizations "in parallel"
+
+If you are fitting a SED, you need to explore many models and combinations of parameters. Unfortunately, we do not have yet any MCMC fitting that does this automatically for you. Here is how I usually run the ADAF models in parallel ("dumb parallelization"). I created three folders inside `adaf_code/perl` named `run01`, `run02` and `run03`. Inside each of these folders there is a parameter file `in.dat`. 
+
+I open one terminal with three tabs corresponding to each folder (or three terminals). Then I edit the three input files corresponding to a set of models, and finally run the program at the same time in each terminal. Hence why "dumb parallelization".
+
+The image below shows a screenshot of OS X during a typical parallel run. 
+
+![OS X running code in parallel](./osxparallel.png =300x) 
+
+
+
 
 ## More details about setting the boundary conditions
 
