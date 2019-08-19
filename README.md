@@ -50,6 +50,7 @@ The parameters of the model are:
 | *delta* | fraction of energy dissipated via turbulence that directly heats electrons |
 | *gamma* | adiabatic index |
 
+The units of the parameters are described in the input parameter files included in the `examples` folder. 
 
 # Usage
 
