@@ -3,9 +3,9 @@ Radiatively inefficient accretion flow: Dynamics and spectrum
 
 This is a set of routines to compute the spectral energy distributions (SEDs) of radiatively inefficient accretion flows (RIAFs) around black holes. This should be useful for researchers interested in modeling the electromagnetic radiation from e.g. low-luminosity active galactic nuclei, X-ray binaries and other astrophysical applications. A RIAF consists of a geometrically thick, optically thin accretion flow filled with a very hot, two-temperature gas with the ion temperatures reaching 1E12 K. 
 
-These routines use a semi-analytical approach to treat the radiation from the RIAF (also called sometimes advection-dominated accretion flows, ADAFs) in which the accretion flow is considered stationary assuming an α-viscosity and a pseudo-Newtonian gravity, and the radiative transfer is treated in considerable detail, taking into account synchrotron, inverse Compton scattering and bremsstrahlung processes as appropriate for hot plasmas (e.g. [Nemmen et al. 2006](https://iopscience.iop.org/article/10.1086/500571); [Nemmen et al. 2014](https://academic.oup.com/mnras/article/438/4/2804/2907740)).
+These routines use a semi-analytical approach to treat the radiation from the RIAF (also called sometimes advection-dominated accretion flows, ADAFs) in which the accretion flow is considered stationary assuming an α-viscosity and a pseudo-Newtonian gravity, and the radiative transfer is treated in considerable detail, taking into account synchrotron, inverse Compton scattering and bremsstrahlung processes as appropriate for hot plasmas (e.g. [Yuan et al. 2005](https://iopscience.iop.org/article/10.1086/427206); [Nemmen et al. 2006](https://iopscience.iop.org/article/10.1086/500571); [Nemmen et al. 2014](https://academic.oup.com/mnras/article/438/4/2804/2907740)).
 
-The bottleneck of the calculations is in solving the dynamical structure of the flow and computing the inverse Compton radiation. The radiative transfer calculations take advantage of parallel architectures with OpenMP. The expected speedup is `ncores/2` compared with the serial code, where `ncores` is the number of CPU cores in your machine.
+The bottleneck of the calculations is in solving the dynamical structure of the flow and computing the inverse Compton radiation. The radiative transfer calculations take advantage of parallel architectures with OpenMP. The expected speedup is `ncores/2` compared with a serial run, where `ncores` is the number of CPU cores in your machine.
 
 ![The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).](./m87sed.png) 
 Figure: The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).
@@ -35,8 +35,20 @@ The Fortran binaries will be located inside the `fortran` dir. The Perl binaries
 
 These routines use a semi-analytical approach to treat the radiation from the RIAF (also called sometimes advection-dominated accretion flows, ADAFs) in which the accretion flow is considered stationary assuming an α-viscosity and a pseudo-Newtonian gravity, and the radiative transfer is treated in considerable detail, taking into account synchrotron, inverse Compton scattering and bremsstrahlung processes as appropriate for hot plasmas (e.g. [Nemmen et al. 2006](https://iopscience.iop.org/article/10.1086/500571); [Nemmen et al. 2014](https://academic.oup.com/mnras/article/438/4/2804/2907740)).
 
-Our model for the RIAF emission follows [Nemmen et al. (2014)](https://academic.oup.com/mnras/article/438/4/2804/2907740). We now describe the main parameters of this model. RIAFs are usually characterized by the presence of outflows or winds, which prevent a considerable fraction of the gas that is available at large radii from being accreted onto the black hole (see Yuan & Narayan 2014 for a review). In order to take this mass-loss into account, we introduce the parameter *s* to describe the radial variation of the accretion rate as $\dot{M}(R) = \dot{M}_{\rm o} \left( R/R_{\rm o} \right)^{s}$ (or $\rho(R) \propto R^{-3/2+s}$) where $\dot{M}_{\rm o}$ is the rate measured at the outer radius $R_{\rm o}$ of the RIAF (Blandford & Begelman 1999). The other parameters that describe the RIAF solution are the black hole mass *M*; the viscosity parameter *alpha*; the modified plasma *beta* parameter, defined as the ratio between the gas and total pressures; the fraction of energy dissipated via turbulence that directly heats electrons *delta*; and the adiabatic index *gamma*.
+Our model for the RIAF emission is described in [Nemmen et al. (2014)](https://academic.oup.com/mnras/article/438/4/2804/2907740). RIAFs are usually characterized by the presence of outflows or winds, which prevent a considerable fraction of the gas that is available at large radii from being accreted onto the black hole (see [Yuan & Narayan 2014](https://www.annualreviews.org/doi/10.1146/annurev-astro-082812-141003) for a review). In order to take this mass-loss into account, the radial variation of the accretion rate is parameterized as $\dot{M}(R) = \dot{M}_{\rm o} \left( R/R_{\rm o} \right)^{s}$ (or $\rho(R) \propto R^{-3/2+s}$) where $\dot{M}_{\rm o}$ is the rate measured at the outer radius $R_{\rm o}$ of the RIAF (Blandford & Begelman 1999). 
 
+The parameters of the model are:
+
+| Parameter | Description |
+|:--|:--|
+| *s* | power-law index for accretion rate (or density) radial variation |
+| *\dot{M}_o* | mass accretion rate at the outer radius |
+| *R_o* | outer radius |
+| *M* | black hole mass |
+| *alpha* | Shakura-Sunyaev viscosity parameter  |
+| *beta* | ratio between the gas and total pressures |
+| *delta* | fraction of energy dissipated via turbulence that directly heats electrons |
+| *gamma* | adiabatic index |
 
 
 # Usage
@@ -96,6 +108,8 @@ MNRAS, 2014 , 438 , 2804](http://mnras.oxfordjournals.org/content/438/4/2804)
 # References
 
 General, succint description of SED models: [Nemmen et al. (2014)](http://mnras.oxfordjournals.org/content/438/4/2804)
+
+Broad review about theory and application of RIAFs: [Yuan & Narayan (2014)](https://www.annualreviews.org/doi/10.1146/annurev-astro-082812-141003) 
 
 More details about models: [Rodrigo Nemmen's PhD thesis](http://hdl.handle.net/10183/16325) (in portuguese), [Yuan et al. (2003)](http://adsabs.harvard.edu/abs/2003ApJ...598..301Y)
 
