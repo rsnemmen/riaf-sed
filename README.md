@@ -35,20 +35,22 @@ The Fortran binaries will be located inside the `fortran` dir. The Perl binaries
 
 These routines use a semi-analytical approach to treat the radiation from the RIAF (also called sometimes advection-dominated accretion flows, ADAFs) in which the accretion flow is considered stationary assuming an α-viscosity and a pseudo-Newtonian gravity, and the radiative transfer is treated in considerable detail, taking into account synchrotron, inverse Compton scattering and bremsstrahlung processes as appropriate for hot plasmas (e.g. [Nemmen et al. 2006](https://iopscience.iop.org/article/10.1086/500571); [Nemmen et al. 2014](https://academic.oup.com/mnras/article/438/4/2804/2907740)).
 
-Our model for the RIAF emission is described in [Nemmen et al. (2014)](https://academic.oup.com/mnras/article/438/4/2804/2907740). RIAFs are usually characterized by the presence of outflows or winds, which prevent a considerable fraction of the gas that is available at large radii from being accreted onto the black hole (see [Yuan & Narayan 2014](https://www.annualreviews.org/doi/10.1146/annurev-astro-082812-141003) for a review). In order to take this mass-loss into account, the radial variation of the accretion rate is parameterized as $\dot{M}(R) = \dot{M}_{\rm o} \left( R/R_{\rm o} \right)^{s}$ (or $\rho(R) \propto R^{-3/2+s}$) where $\dot{M}_{\rm o}$ is the rate measured at the outer radius $R_{\rm o}$ of the RIAF (Blandford & Begelman 1999). 
+Our model for the RIAF emission is described in [Nemmen et al. (2014)](https://academic.oup.com/mnras/article/438/4/2804/2907740). RIAFs are usually characterized by the presence of outflows or winds, which prevent a considerable fraction of the gas that is available at large radii from being accreted onto the black hole (see [Yuan & Narayan 2014](https://www.annualreviews.org/doi/10.1146/annurev-astro-082812-141003) for a review). In order to take this mass-loss into account, the radial variation of the accretion rate is parameterized as $\dot{M}(R) = \dot{M}_{\rm o} \left( R/R_{\rm o} \right)^{s}$ 
+(or $\rho(R) \propto R^{-3/2+s}$) 
+where $\dot{M}_{\rm o}$ is the rate measured at the outer radius $R_{\rm o}$ of the RIAF (Blandford & Begelman 1999). 
 
 The parameters of the model are:
 
 | Parameter | Description |
 |:--|:--|
-| *s* | power-law index for accretion rate (or density) radial variation |
-| *\dot{M}_o* | mass accretion rate at the outer radius |
-| *R_o* | outer radius |
-| *M* | black hole mass |
-| *alpha* | Shakura-Sunyaev viscosity parameter  |
-| *beta* | ratio between the gas and total pressures |
-| *delta* | fraction of energy dissipated via turbulence that directly heats electrons |
-| *gamma* | adiabatic index |
+| `s` | power-law index for accretion rate (or density) radial variation |
+| $\dot{M}_o$ | mass accretion rate at the outer radius |
+| `R_o` | outer radius |
+| `M` | black hole mass |
+| `alpha` | Shakura-Sunyaev viscosity parameter  |
+| `beta` | ratio between the gas and total pressures |
+| `delta` | fraction of energy dissipated via turbulence that directly heats electrons |
+| `gamma` | adiabatic index |
 
 The units of the parameters are described in the input parameter files included in the `examples` folder. 
 
