@@ -1,13 +1,13 @@
 Radiatively inefficient accretion flow: Dynamics and spectrum
 ==================================================
 
-This is a set of routines to compute the spectral energy distributions (SEDs) of radiatively inefficient accretion flows (RIAFs) around black holes. This should be useful for researchers interested in modeling the electromagnetic radiation from e.g. low-luminosity active galactic nuclei, X-ray binaries and other astrophysical applications. A RIAF consists of a geometrically thick, optically thin accretion flow filled with a very hot, two-temperature gas with the ion temperatures reaching 1E12 K. 
+This is a set of routines to compute the spectral energy distributions (SEDs) of radiatively inefficient accretion flows (RIAFs) around black holes. This should be useful for researchers interested in modeling the electromagnetic radiation from e.g. low-luminosity active galactic nuclei, X-ray binaries and other astrophysical applications. A RIAF consists of a geometrically thick, optically thin accretion flow filled with a very hot, two-temperature gas with the ion temperatures reaching $10^{12}$ K. 
 
 These routines use a semi-analytical approach to treat the radiation from the RIAF (also called sometimes advection-dominated accretion flows, ADAFs) in which the accretion flow is considered stationary assuming an α-viscosity and a pseudo-Newtonian gravity, and the radiative transfer is treated in considerable detail, taking into account synchrotron, inverse Compton scattering and bremsstrahlung processes as appropriate for hot plasmas (e.g. [Yuan et al. 2005](https://iopscience.iop.org/article/10.1086/427206); [Nemmen et al. 2006](https://iopscience.iop.org/article/10.1086/500571); [Nemmen et al. 2014](https://academic.oup.com/mnras/article/438/4/2804/2907740)).
 
 The bottleneck of the calculations is in solving the dynamical structure of the flow and computing the inverse Compton radiation. The radiative transfer calculations take advantage of parallel architectures with OpenMP. The expected speedup is `ncores/2` compared with a serial run, where `ncores` is the number of CPU cores in your machine.
 
-![The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).](./m87sed.png) 
+![The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).](./docs/m87sed.png) 
 Figure: The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).
 
 # Requirements
@@ -69,7 +69,7 @@ The units of the parameters are described in the input parameter files included 
 2. once you get a good (physical) global solution in step 1, run `perl/spectrum.pl` to generate ADAF SED 
 3. optional: run `perl/ssd.pl` to compute truncated thin disk SED
 
-For visualizing the resulting SEDs, use the code `work/codes/python/model.py`
+For visualizing the resulting SEDs, use the code `work/codes/python/model.py` (TBD).
 
 If you are having trouble finding a global solution, try playing around with `dyntype.pl`. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.
 
@@ -99,9 +99,7 @@ Please refer to the Appendix A of my [PhD thesis](http://hdl.handle.net/10183/16
 You are morally obligated to cite the following papers in any scientific literature that results from use of any part of this code:
 
 1. [Yuan, F.; Cui, W. & Narayan, R. An Accretion-Jet Model for Black Hole Binaries: Interpreting the Spectral and Timing Features of XTE J1118+480. ApJ, 2005 , 620 , 905](https://iopscience.iop.org/article/10.1086/427206)
-2. [Nemmen, R. S.; Storchi-Bergmann, T. & Eracleous, M.
-Spectral models for low-luminosity active galactic nuclei in LINERs: the role of advection-dominated accretion and jets 
-MNRAS, 2014 , 438 , 2804](http://mnras.oxfordjournals.org/content/438/4/2804)
+2. [Nemmen, R. S.; Storchi-Bergmann, T. & Eracleous, M. Spectral models for low-luminosity active galactic nuclei in LINERs: the role of advection-dominated accretion and jets MNRAS, 2014 , 438 , 2804](http://mnras.oxfordjournals.org/content/438/4/2804)
 3. [Yuan, F.; Zdziarski, A. A.; Xue, Y.; Wu, X. Modeling the Hard States of XTE J1550-564 during Its 2000 Outburst. ApJ, 2007, 659, 541](https://ui.adsabs.harvard.edu/abs/2007ApJ...659..541Y/abstract)
 
 
@@ -124,6 +122,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 
 By order of priority:
 
+- [ ] include scripts for plotting the SEDs
 - [ ] port the core fortran code to C and better organize it
 - [ ] add nonthermal emission
 - [ ] OpenACC version for radiative transfer
@@ -132,7 +131,7 @@ By order of priority:
 
 ---
 
-Copyright (c) 2019, [Rodrigo Nemmen](http://rodrigonemmen.com), [Feng Yuan](http://center.shao.ac.cn/fyuan/yuan.html).
+Copyright (c) 2024, [Rodrigo Nemmen](https://rodrigonemmen.com), [Feng Yuan](https://scholar.google.com/citations?user=eGeeIDAAAAAJ).
 [All rights reserved](http://opensource.org/licenses/BSD-2-Clause).
 
 
