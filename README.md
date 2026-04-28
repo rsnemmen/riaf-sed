@@ -26,10 +26,15 @@ To install the required Perl modules use the commands:
 
 To compile the routines, please clone this repository in your machine and then issue these commands inside the repo folder:
 
-    cd fortran
-    make
+    make build
 
 The Fortran binaries will be located inside the `fortran` dir. The Perl binaries are in the `perl` dir.
+
+Convenience targets at the repository root:
+
+- `make build` — compile the Fortran executables via `fortran/Makefile`
+- `make clean` — remove the compiled Fortran binaries
+- `make smoke` — run the lightweight smoke/regression checks in `tests/smoke.pl`
 
 # Model description
 
@@ -58,7 +63,7 @@ The units of the parameters are described in the input parameter files included 
 
 ## Model setup
 
-- build the Fortran binaries with `cd fortran && make`
+- build the Fortran binaries with `make build`
 - run the Perl wrappers directly from this repository; `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl` now resolve the compiled binaries relative to the repo automatically, so no manual path editing is required
 - cd to the directory that will contain the SED
 - edit the input file `in.dat` with the desired model parameters
@@ -104,7 +109,7 @@ Please refer to the Appendix A of my [PhD thesis](http://hdl.handle.net/10183/16
 
 Run the lightweight smoke/regression checks against the bundled fixtures and example outputs with:
 
-    perl tests/smoke.pl
+    make smoke
 
 This command rebuilds the Fortran binaries, checks representative "nice" and "bad" dynamical solutions from `tests/testcases_for_code/`, and verifies the bundled `tests/n1097/` and `tests/m81/` example outputs are still parseable and physically plausible.
 
@@ -148,4 +153,3 @@ By order of priority:
 
 Copyright (c) 2024, [Rodrigo Nemmen](https://rodrigonemmen.com), [Feng Yuan](https://scholar.google.com/citations?user=eGeeIDAAAAAJ).
 [All rights reserved](http://opensource.org/licenses/BSD-2-Clause).
-

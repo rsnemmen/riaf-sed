@@ -11,12 +11,12 @@ ADAF (Advection-Dominated Accretion Flow) SED calculator — computes spectral e
 ## Build
 
 ```bash
-cd fortran
-make          # builds all four executables: dynamics, spectrum, ssd_new, ssd_alone
+make build    # builds all four executables: dynamics, spectrum, ssd_new, ssd_alone
 make clean    # removes binaries
+make smoke    # runs lightweight smoke/regression checks
 ```
 
-Individual targets: `make dynamics`, `make spectrum`, `make ssd`, `make ssd_alone`
+The top-level `Makefile` delegates to `fortran/Makefile`. Individual Fortran targets are still available in `fortran/`: `make dynamics`, `make spectrum`, `make ssd`, `make ssd_alone`
 
 - Compiler: `gfortran` with `-O` optimization
 - `dynamics` uses `-ffpe-trap=invalid,zero` (prevents hangs on NaN)
@@ -24,7 +24,7 @@ Individual targets: `make dynamics`, `make spectrum`, `make ssd`, `make ssd_alon
 
 ## Typical Workflow
 
-All runs happen in a working directory containing `in.dat` and the interpolation tables (`aomi-*.dat`, `romi-*.dat`). Adjust paths to executables in `dyn.pl`, `spectrum.pl`, and `ssd.pl` first.
+All runs happen in a working directory containing `in.dat` and the interpolation tables (`aomi-*.dat`, `romi-*.dat`). Build the Fortran binaries first with `make build`; the supported Perl wrappers resolve those binaries relative to the repository, so no manual path editing is required.
 
 1. Edit `in.dat` with model parameters
 2. Find physical global solution: `perl /path/to/perl/dyn.pl`
@@ -42,7 +42,7 @@ The code uses a shooting method (boundary value problem) to find the global dyna
 in.dat → dyn.pl → dynamics (Fortran) → x.dat (radial structure)
                                               ↓
                              spectrum.pl → spectrum (Fortran) → spectrum.dat
-                             ssd.pl      → ssd_new  (Fortran) → *_ssd
+                             ssd.pl      → ssd_alone (Fortran) → *_ssd
 ```
 
 **Key components:**
@@ -52,8 +52,10 @@ in.dat → dyn.pl → dynamics (Fortran) → x.dat (radial structure)
 | `fortran/dynamics.f` | Solves ADAF radial ODE structure (Runge-Kutta, 4 unknowns: R, v_R, T_e, T_i) |
 | `fortran/spectrum.f` | Radiative transfer: synchrotron, inverse Compton (2D lookup tables), bremsstrahlung |
 | `fortran/ssd_new.f` | Thin disk spectrum with ADAF illumination |
+| `fortran/ssd_alone.f` | Standalone thin disk spectrum used by `perl/ssd.pl` |
 | `perl/dyn.pl` | Eigenvalue solver — searches `sl0` range, detects physical solutions automatically |
 | `perl/spectrum.pl` | Wrapper; generates two outputs (with/without Compton) |
+| `perl/ssd.pl` | Wrapper for the standalone thin disk spectrum executable |
 | `perl/dyntype.pl` | Manual eigenvalue inspector with gnuplot diagnostics |
 | `perl/adaf.pl` | Single-model runner with diagnostic plots |
 
@@ -115,6 +117,8 @@ Install Perl modules: `sudo cpan Math::Derivative && sudo cpan Chart::Gnuplot`
 - `out_discont*.dat` — discontinuous/invalid solutions
 
 `tests/n1097/` and `tests/m81/` contain complete example model runs.
+
+Run the lightweight smoke/regression checks with `make smoke`. This rebuilds the Fortran binaries, checks representative good/bad dynamical fixtures, and validates bundled example spectra.
 
 ## Useful Output Variables (in `x.dat` / log file)
 
