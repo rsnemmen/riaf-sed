@@ -58,7 +58,8 @@ The units of the parameters are described in the input parameter files included 
 
 ## Model setup
 
-- edit `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl` and adjust the path to the executables (variables `$dynbinary`, `$specbin` and `$specbin`, respectively)
+- build the Fortran binaries with `cd fortran && make`
+- run the Perl wrappers directly from this repository; `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl` now resolve the compiled binaries relative to the repo automatically, so no manual path editing is required
 - cd to the directory that will contain the SED
 - edit the input file `in.dat` with the desired model parameters
 - include in this directory the following files: `aomi*dat`, `romi*dat`
@@ -69,7 +70,12 @@ The units of the parameters are described in the input parameter files included 
 2. once you get a good (physical) global solution in step 1, run `perl/spectrum.pl` to generate ADAF SED 
 3. optional: run `perl/ssd.pl` to compute truncated thin disk SED
 
-For visualizing the resulting SEDs, use the code `work/codes/python/model.py` (TBD).
+The scripts above are meant to be invoked from the working directory that contains `in.dat`, `x.dat`, and the interpolation tables, for example:
+
+    cd /path/to/model-run
+    perl /path/to/repo/perl/dyn.pl
+    perl /path/to/repo/perl/spectrum.pl
+    perl /path/to/repo/perl/ssd.pl
 
 If you are having trouble finding a global solution, try playing around with `dyntype.pl`. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.
 
@@ -92,6 +98,15 @@ The guideline for setting the ADAF outer boundary conditions is:
 - Rout ~ 100Rs: e.g., Rout=100 R_g, T_i=0.6 Tvir, T_e=0.08Tvir, vcs=0.5
 
 Please refer to the Appendix A of my [PhD thesis](http://hdl.handle.net/10183/16325) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta) for more information on the BC choices.
+
+
+# Smoke tests
+
+Run the lightweight smoke/regression checks against the bundled fixtures and example outputs with:
+
+    perl tests/smoke.pl
+
+This command rebuilds the Fortran binaries, checks representative "nice" and "bad" dynamical solutions from `tests/testcases_for_code/`, and verifies the bundled `tests/n1097/` and `tests/m81/` example outputs are still parseable and physically plausible.
 
 
 # Citation
@@ -133,5 +148,4 @@ By order of priority:
 
 Copyright (c) 2024, [Rodrigo Nemmen](https://rodrigonemmen.com), [Feng Yuan](https://scholar.google.com/citations?user=eGeeIDAAAAAJ).
 [All rights reserved](http://opensource.org/licenses/BSD-2-Clause).
-
 

@@ -7,6 +7,10 @@
 # Requires the code ssd_alone.f, my modification of Feng's code in
 # which I removed the illumination effect.
 
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+use ADAF::Paths qw(fortran_binary);
+
 # Needed so that I can plot with Gnuplot
 use FileHandle; # see http://perl.plover.com/FAQs/Buffering.html
 
@@ -34,7 +38,7 @@ $outfile="ssd_alone.dat";
 #&readParam;
 
 # Opens pipe to ADAF dynamics code
-open(SSD,"|~/work/projects/adafjet/adaf/fortran/ssd_alone");
+open(SSD,"|-", fortran_binary($Bin, "ssd_alone")) || die "Can't open ssd_alone !\n";
 
 #print SSD "$distance \n";
 print SSD "$m \n";

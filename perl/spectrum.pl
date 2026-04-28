@@ -3,13 +3,13 @@
 # Passes many arguments to the ADAF fortran codes sent by Feng Yuan.
 # You need first to compile these codes (of course).
 
-# Path to ADAF spectrum executable
-$specbin="~/science/projects/adafjet/adaf/fortran/spectrum";
-
 # For computing derivatives. Download the required library from 
 # http://search.cpan.org/~jarw/Math-Derivative-0.01/Derivative.pm
 # and follow the readme instructions to install it.
+use FindBin qw($Bin);
+use lib "$Bin/lib";
 use Math::Derivative qw(Derivative1 Derivative2); 
+use ADAF::Paths qw(fortran_binary);
 
 # Needed so that I can plot with Gnuplot
 use FileHandle; # see http://perl.plover.com/FAQs/Buffering.html
@@ -20,6 +20,9 @@ $bench0 = new Benchmark;
 
 # Module needed for copying files without using an external program
 use File::Copy;
+
+# Path to ADAF spectrum executable
+$specbin=fortran_binary($Bin, "spectrum");
 
 # Gets values of parameters from external parameter file
 &readParam;
@@ -138,7 +141,7 @@ close PARFILE;
 sub withoutCompt {
 
 # Opens pipe to ADAF spectrum code
-open(SPEC,"| $specbin");
+open(SPEC,"|-", $specbin) || die "Can't open $specbin !\n";
 
 # Runs first without Comptonization!
 print SPEC "$beta \n";
@@ -219,7 +222,7 @@ $nuf=$nuf . "d0";
 # calculated from the first run.
 sub withCompt {
 # Opens pipe to ADAF dynamics code
-    open(SPEC,"| $specbin");
+    open(SPEC,"|-", $specbin) || die "Can't open $specbin !\n";
 
 # 2nd run with Comptonization enabled
     print SPEC "$beta \n";

@@ -17,17 +17,21 @@
 # - test if Mach > 1 in the inner regions and Mach decreases outwards
 # - test for smoothness nearby the sonic point
 
-# Path to ADAF dynamics executable
-$dynbinary="~/science/projects/adafjet/adaf/fortran/dynamics";
-
 # For computing derivatives. Download the required library from 
 # http://search.cpan.org/~jarw/Math-Derivative-0.01/Derivative.pm
 # and follow the readme instructions to install it.
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+use IPC::Open2;
 use Math::Derivative qw(Derivative1 Derivative2); 
+use ADAF::Paths qw(fortran_binary);
 
 # Module needed to benchmark the execution time of the code
 use Benchmark; # see http://perldoc.perl.org/Benchmark.html
 $bench0 = new Benchmark;
+
+# Path to ADAF dynamics executable
+$dynbinary=fortran_binary($Bin, "dynamics");
 
 # Gets values of parameters from external parameter file
 &readParam;
@@ -270,9 +274,8 @@ foreach (@x) {
 
 # Calls adaf Fortran code and computes dynamical solution
 sub dynamics {
-# Opens pipe to ADAF dynamics code
-open(DYN,"| $dynbinary | tee -a $diag") || 
-  die "Can't open program dynamics_new! \n";
+my $reader;
+my $pid = open2($reader, \*DYN, $dynbinary);
 
 # Passes arguments to the fortran code
 # Adiabatic index gamma
@@ -303,6 +306,18 @@ print DYN "$vcs \n";
 print DYN "$sl0 \n";
 
 close(DYN);
+
+open (LOGAPPEND, ">>$diag") || 
+  die "Can't open $diag !";
+
+while (<$reader>) {
+  print;
+  print LOGAPPEND $_;
+}
+
+close($reader);
+close(LOGAPPEND);
+waitpid($pid, 0);
 }
 
 
