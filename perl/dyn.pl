@@ -54,7 +54,7 @@ $brackets=0;
 
 # Main loop
 while ($sl0<=$sl0f+$d_sl0) {
-print "\n \nEigenvalue = $sl0 \nIteration $iterat \nBrackets $brackets \n \n";
+$current_sl0=$sl0;
 
 # Creates header of each log file
 # The output file keeps being rewritten until the final run.
@@ -71,14 +71,14 @@ print "\n \nEigenvalue = $sl0 \nIteration $iterat \nBrackets $brackets \n \n";
 
 # Decides if the solution is OK or not, and what should be done next
 if ($increase==1 && $discont==0 && $weirdam==0 && $sonic !~ /Problem!/ && $nan==0 && $nooutput==0) {
-  print "\nNice solution!! (iteration $iterat, brackets $brackets) \n";
+  print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=nice solution\n";
   $ops=0; # signal that solution was found, used after end of loop
   last; #  ****EXIT LOOP
 
   } elsif ( ($increase==0) && ($sonic =~ /Problem!/) ) {
   $lastok=$sl0; # stores the last eigenvalue computed with no stops or jumps
   $sl0=$sl0+$d_sl0;
-  print "\nSubsonic solution \n";
+  print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=subsonic\n";
   $ops=1;
   $iterat++;
 
@@ -90,15 +90,13 @@ if ($increase==1 && $discont==0 && $weirdam==0 && $sonic !~ /Problem!/ && $nan==
   } elsif ( $nooutput==1 || ($increase==1 && $sonic =~ /Problem!/) || ($increase==1 && $discont==1) ||  $weirdam==1 || ($discont==1 && $sonic !~ /Problem!/) ) { #  || $nan==1 || ($increase==0 && $sonic !~ /Problem!/)
 
   if ($nooutput==1) {
-      print "\n**************************** \n";
-      print "\nNO GLOBAL SOLUTION. Verify the OBCs! \n";
-      print "**************************** \n\n";
+      $status="no global solution; verify the OBCs";
+  } else {
+      $status="bracketing";
   }
 
   if ($iterat==1) {
-      print "\n**************************** \n";
-      print "Bad eigenvalue at 1st iteration! Decrease the lower limit. \n";
-      print "**************************** \n";
+      print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=bad eigenvalue at 1st iteration; decrease the lower limit\n";
       $ops=1;
       last;  }
 
@@ -108,41 +106,34 @@ if ($increase==1 && $discont==0 && $weirdam==0 && $sonic !~ /Problem!/ && $nan==
   $sl0f=$sl0;
   $d_sl0=($bad-$lastok)/$nmodels;
   $sl0=$lastok+$d_sl0; 
-  print "\nBracketing condition found \n";
+  print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=$status\n";
   $iterat++;
   $brackets++;
     
   } else {
-  print "\nSomething weird happened! Check conditions! \n";
+  print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=weird result; check conditions\n";
   $ops=1;
   last;
   
 }
 
-# Prints results of diagnostics
-print "\nDiagnostics: \n";
-print "Increasing? $increase \"Jumps\"? $discont R_sonic~$sonic Weird A. M.? $weirdam NaN? $nan \"FAILED\"? $failed \n";
-print "No output? $nooutput Mach_max=$largest R_max=$largestR \n";
 } 
 
 if ($ops == 1) {
 # To print the diagnostics for the bad solution
-  print "\nDiagnostics: \n";
-  print "Increasing? $increase \"Jumps\"? $discont R_sonic~$sonic Weird A. M.? $weirdam NaN? $nan \"FAILED\"? $failed \n";
-  print "\nEigenvalue = $sl0   ||   No output? $nooutput Mach_max=$largest R_max=$largestR \n";
-  print "\nNo solution found within the eigenvalue interval. Try changing the OBCs, \nor range/step of eigenvalues. \n"
+  print "\nNo solution found within the eigenvalue interval. Try changing the OBCs, or range/step of eigenvalues. \n";
+  print "Final eigenvalue=$sl0 status=failed no_output=$nooutput sonic=$sonic mach_max=$largest r_mach_max=$largestR \n";
 } else {
 # To print the diagnostics for the nice solution
-  print "\nDiagnostics: \n";
-  print "Increasing? $increase \"Jumps\"? $discont R_sonic~$sonic Weird A. M.? $weirdam NaN? $nan \"FAILED\"? $failed \n";
-  print "\nEigenvalue = $sl0   ||   No output? $nooutput Mach_max=$largest R_max=$largestR \n";
-  print "Number of shells = $linesout (number of lines in the output file) \n";
+  print "\nSolution found. \n";
+  print "Final eigenvalue=$sl0 status=ok no_output=$nooutput sonic=$sonic mach_max=$largest r_mach_max=$largestR shells=$linesout \n";
 }
+print "Output file: $diag \n";
 
 # For benchmarking the execution time
 $bench1 = new Benchmark;
 $dbench = timediff($bench1, $bench0);
-print "\nThe code took: ", timestr($dbench),"\n";
+print "Runtime: ", timestr($dbench),"\n";
 
 
 
@@ -311,7 +302,6 @@ open (LOGAPPEND, ">>$diag") ||
   die "Can't open $diag !";
 
 while (<$reader>) {
-  print;
   print LOGAPPEND $_;
 }
 
