@@ -52,3 +52,12 @@
 /perl/hot.dat
 /perl/hottem.dat
 /perl/run0*/
+/perl/test/
+
+# Working-directory outputs when running examples in place
+/examples/in.dat
+/examples/hot.dat
+/examples/hottem.dat
+/examples/x.dat
+/examples/parameters.txt
+/examples/out/
