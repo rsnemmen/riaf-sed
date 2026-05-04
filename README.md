@@ -102,32 +102,20 @@ With no parameter-file argument, the scripts read `in.dat` from the working dire
 
 The scripts above are meant to be invoked from the working directory that contains the selected parameter file and, for `spectrum.pl`, the matching `x.dat` produced by `dyn.pl`.
 
-If you are having trouble finding a global solution, try playing around with `dyntype.pl`. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.
-
-## Examples of models
+## Parameter files: where to start
 
 Two examples of input parameter files are included in the `examples` folder:
 
 - `largeR.dat`: ADAF with *R_out=1E4 Rs*
 - `smallR.dat`: *R_out=500 Rs*
 
-In order to compute the corresponding models, either copy one to `in.dat` or pass the file explicitly, for example `perl /path/to/repo/perl/run_model.pl /path/to/repo/examples/largeR.dat`.
- 
+In order to compute the corresponding models, either copy one to `in.dat` or pass the file explicitly, for example `perl perl/run_model.pl examples/largeR.dat`.
 
-
-## Boundary conditions
-
-The guideline for setting the ADAF outer boundary conditions is:
-
-- Large Rout (R>~ a few thousand R_g): e.g., Rout=1e4 Rs, T_i=0.2 Tvir, T_e=0.19Tvir, vcs=0.2
-- Rout ~ 100Rs: e.g., Rout=100 R_g, T_i=0.6 Tvir, T_e=0.08Tvir, vcs=0.5
-
-Please refer to the Appendix A of my [PhD thesis](http://hdl.handle.net/10183/16325) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta) for more information on the BC choices.
-
+For more information and useful references, refer to [this document](./docs/advice.md). 
 
 # Smoke tests
 
-Run the lightweight smoke/regression checks against the bundled fixtures and example outputs with:
+Test suite can be run with:
 
     make smoke
 
@@ -144,22 +132,8 @@ You are morally obligated to cite the following papers in any scientific literat
 
 
 
-
-
-# References
-
-General, succinct description of SED models: [Nemmen et al. (2014)](http://mnras.oxfordjournals.org/content/438/4/2804)
-
-Broad review about theory and application of RIAFs: [Yuan & Narayan (2014)](https://www.annualreviews.org/doi/10.1146/annurev-astro-082812-141003) 
-
-More details about models: [Rodrigo Nemmen's PhD thesis](http://hdl.handle.net/10183/16325) (in portuguese), [Yuan et al. (2003)](http://adsabs.harvard.edu/abs/2003ApJ...598..301Y)
-
-Global solutions: [Manmoto et al. (1997)](http://iopscience.iop.org/article/10.1086/304817/meta); [Narayan et al. (1997)](http://iopscience.iop.org/article/10.1086/303591/meta)
-
-Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/10183/16325) (in portuguese) or [Yuan, Ma & Narayan 2008, ApJ, 679, 984](http://iopscience.iop.org/article/10.1086/587484/meta). 
-
 # TODO 
 
 - [x] include general-purpose user scripts for plotting SEDs
 - [ ] add nonthermal emission
-- [ ] improve parallelization, radiative transfer
+- [x] improve parallelization, radiative transfer
