@@ -14,7 +14,7 @@ This repository computes ADAF/RIAF dynamics and spectra using Fortran solvers wi
 ## Build, Test, and Development Commands
 
 - `make build`: compile all Fortran executables into `bin/`.
-- `make smoke`: build binaries and run lightweight smoke/regression checks, including the `largeR` dynamics profile comparison.
+- `make smoke`: build binaries and run smoke/regression checks, including the `largeR` profile comparison and plot artifact.
 - `make clean`: remove compiled binaries and Fortran build artifacts.
 - `make clean-data`: remove top-level generated data products from test/model runs.
 - Example run: `perl perl/dyn.pl examples/largeR.dat`.
@@ -29,7 +29,7 @@ Use descriptive filenames matching existing patterns: `out_*` for dynamics outpu
 
 ## Testing Guidelines
 
-The primary test entry point is `make smoke`. It validates good/bad dynamics fixtures, bundled example spectra, and compares `perl/dyn.pl examples/largeR.dat` against `tests/reference/largeR_dyn.out` using `tests/compare_dynamics.py`.
+The primary test entry point is `make smoke`. It validates good/bad dynamics fixtures, bundled example spectra, and compares `perl/dyn.pl examples/largeR.dat` against `tests/reference/largeR_dyn.out` using `tests/compare_dynamics.py`. It writes `tests/artifacts/largeR_dynamics.png` for inspection.
 
 When changing dynamics behavior, regenerate the fiducial only if the numerical change is intentional and scientifically reviewed. Preserve diagnostic failures that catch nonphysical solutions.
 
@@ -41,4 +41,4 @@ Pull requests should describe the scientific or workflow motivation, list comman
 
 ## Configuration Notes
 
-Required tools are `gfortran`, Perl modules `Math::Derivative` and `Chart::Gnuplot`, and Python 3 for regression comparisons. Gnuplot is optional for diagnostic plotting.
+Required tools are `gfortran`, Perl modules `Math::Derivative` and `Chart::Gnuplot`, and Python 3 with Matplotlib. Gnuplot is optional for diagnostic plotting.

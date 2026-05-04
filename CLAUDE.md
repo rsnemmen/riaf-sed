@@ -107,7 +107,7 @@ For parameter space exploration, use "dumb parallelization": create separate run
 
 - `gfortran` with OpenMP support
 - Perl modules: `Math::Derivative`, `Chart::Gnuplot`
-- Python 3 for dynamics profile regression comparisons
+- Python 3 with Matplotlib for dynamics profile regression comparisons and plots
 - Optional: `gnuplot` for diagnostic plots
 
 Install Perl modules: `sudo cpan Math::Derivative && sudo cpan Chart::Gnuplot`
@@ -121,9 +121,9 @@ Install Perl modules: `sudo cpan Math::Derivative && sudo cpan Chart::Gnuplot`
 
 `tests/n1097/` and `tests/m81/` contain complete example model runs.
 
-`tests/reference/largeR_dyn.out` is the fiducial dynamics profile generated from `examples/largeR.dat`. `tests/compare_dynamics.py` compares all 15 radial-profile columns, including Mach number and `log(rho)`.
+`tests/reference/largeR_dyn.out` is the fiducial dynamics profile generated from `examples/largeR.dat`. `tests/compare_dynamics.py` compares all 15 radial-profile columns, including Mach number and `log(rho)`. `tests/plot_dynamics.py` writes a gridded inspection plot to `tests/artifacts/largeR_dynamics.png`.
 
-Run the lightweight smoke/regression checks with `make smoke`. This rebuilds the Fortran binaries, checks representative good/bad dynamical fixtures, validates bundled example spectra, runs `perl/dyn.pl examples/largeR.dat`, and compares the generated profile with the fiducial solution.
+Run the lightweight smoke/regression checks with `make smoke`. This rebuilds the Fortran binaries, checks representative good/bad dynamical fixtures, validates bundled example spectra, runs `perl/dyn.pl examples/largeR.dat`, compares the generated profile with the fiducial solution, and refreshes the dynamics plot artifact.
 
 ## Useful Output Variables (in `x.dat` / log file)
 

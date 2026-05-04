@@ -78,6 +78,8 @@ sub test_largeR_dynamics_regression {
     my $candidate = File::Spec->catfile($workdir, 'out');
     my $reference = File::Spec->catfile($repo_root, 'tests', 'reference', 'largeR_dyn.out');
     my $comparator = File::Spec->catfile($repo_root, 'tests', 'compare_dynamics.py');
+    my $plotter = File::Spec->catfile($repo_root, 'tests', 'plot_dynamics.py');
+    my $plot = File::Spec->catfile($repo_root, 'tests', 'artifacts', 'largeR_dynamics.png');
 
     run_command_in_dir($workdir, 'perl', $dyn_script, $input);
 
@@ -86,6 +88,7 @@ sub test_largeR_dynamics_regression {
     die "$candidate should have 91 profile shells.\n" unless $result->{linesout} == 91;
 
     run_command('python3', $comparator, $reference, $candidate);
+    run_command('python3', $plotter, $reference, $candidate, $plot);
 }
 
 sub run_command_in_dir {

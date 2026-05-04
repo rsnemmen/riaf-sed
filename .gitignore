@@ -3,6 +3,7 @@
 *.bak
 .DS_Store
 .gdbtkinit
+__pycache__/
 
 # Compiled Fortran executables
 /bin/
@@ -58,6 +59,7 @@ romi*.dat
 /perl/test/
 
 # Working-directory outputs when running from tests/
+/tests/artifacts/
 /tests/in.dat
 /tests/hot.dat
 /tests/hottem.dat
