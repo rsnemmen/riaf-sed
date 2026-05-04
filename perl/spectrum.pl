@@ -8,8 +8,9 @@
 # and follow the readme instructions to install it.
 use FindBin qw($Bin);
 use lib "$Bin/lib";
-use Math::Derivative qw(Derivative1 Derivative2); 
-use ADAF::Paths qw(fortran_binary);
+use Math::Derivative qw(Derivative1 Derivative2);
+use ADAF::Paths qw(fortran_binary stage_data_files);
+use Cwd qw(getcwd);
 
 # Needed so that I can plot with Gnuplot
 use FileHandle; # see http://perl.plover.com/FAQs/Buffering.html
@@ -23,6 +24,12 @@ use File::Copy;
 
 # Path to ADAF spectrum executable
 $specbin=fortran_binary($Bin, "spectrum");
+
+# Stage IC lookup tables from data/ into working directory
+stage_data_files($Bin, getcwd(),
+    qw(aomi-1.dat aomi-2.dat aomi-3.dat
+       aomi2-1.dat aomi2-2.dat aomi2-3.dat
+       romi-1.dat romi-2.dat romi-3.dat));
 
 # Gets values of parameters from external parameter file
 &readParam;

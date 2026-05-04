@@ -16,7 +16,7 @@ make clean    # removes binaries
 make smoke    # runs lightweight smoke/regression checks
 ```
 
-The top-level `Makefile` delegates to `fortran/Makefile`. Individual Fortran targets are still available in `fortran/`: `make dynamics`, `make spectrum`, `make ssd`, `make ssd_alone`
+The top-level `Makefile` delegates to `fortran/Makefile`, which outputs binaries to `bin/` at the repo root. Individual targets are still available via `make -C fortran`.
 
 - Compiler: `gfortran` with `-O` optimization
 - `dynamics` uses `-ffpe-trap=invalid,zero` (prevents hangs on NaN)
@@ -24,7 +24,7 @@ The top-level `Makefile` delegates to `fortran/Makefile`. Individual Fortran tar
 
 ## Typical Workflow
 
-All runs happen in a working directory containing `in.dat` and the interpolation tables (`aomi-*.dat`, `romi-*.dat`). Build the Fortran binaries first with `make build`; the supported Perl wrappers resolve those binaries relative to the repository, so no manual path editing is required.
+All runs happen in a working directory containing `in.dat`. Build the Fortran binaries first with `make build`; the Perl wrappers resolve binaries from `bin/` and automatically symlink the IC lookup tables from `data/` into the working directory — no manual copying required.
 
 1. Edit `in.dat` with model parameters
 2. Find physical global solution: `perl /path/to/perl/dyn.pl`
@@ -59,9 +59,9 @@ in.dat → dyn.pl → dynamics (Fortran) → x.dat (radial structure)
 | `perl/dyntype.pl` | Manual eigenvalue inspector with gnuplot diagnostics |
 | `perl/adaf.pl` | Single-model runner with diagnostic plots |
 | `perl/lib/ADAF/Diagnostics.pm` | Solution classifier — parses output, detects sonic point, discontinuities, NaN |
-| `perl/lib/ADAF/Paths.pm` | Resolves Fortran binary paths relative to repo root |
+| `perl/lib/ADAF/Paths.pm` | Resolves Fortran binary paths (`bin/`) and stages data files from `data/` |
 
-**Interpolation tables** (`aomi-*.dat`, `romi-*.dat`): Pre-computed lookup tables for inverse Compton calculations. Must be present in working directory alongside `in.dat`.
+**Interpolation tables** (`data/aomi-*.dat`, `data/romi-*.dat`): Pre-computed lookup tables for inverse Compton calculations. Canonical copies live in `data/`; `spectrum.pl` symlinks them into the working directory automatically.
 
 ## Key Parameters (`in.dat`)
 

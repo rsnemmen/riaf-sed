@@ -28,7 +28,7 @@ To compile the routines, please clone this repository in your machine and then i
 
     make build
 
-The Fortran binaries will be located inside the `fortran` dir. The Perl binaries are in the `perl` dir.
+The compiled Fortran binaries will be placed in the `bin/` directory at the repository root. The Perl wrappers are in the `perl/` dir.
 
 Convenience targets at the repository root:
 
@@ -67,7 +67,7 @@ The units of the parameters are described in the input parameter files included 
 - run the Perl wrappers directly from this repository; `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl` now resolve the compiled binaries relative to the repo automatically, so no manual path editing is required
 - cd to the directory that will contain the SED
 - edit the input file `in.dat` with the desired model parameters
-- include in this directory the following files: `aomi*dat`, `romi*dat`
+- the IC lookup tables (`aomi*.dat`, `romi*.dat`) are staged automatically by `spectrum.pl` from the `data/` directory — no manual copying needed
 
 ## Compute SED
 

@@ -4,15 +4,16 @@
 .DS_Store
 .gdbtkinit
 
-# Built Fortran executables and transient outputs
-/fortran/dynamics
-/fortran/spectrum
-/fortran/ssd_new
-/fortran/ssd_alone
-/fortran/debug
-/fortran/test
-/fortran/dyn_thin
-/fortran/spec_thin
+# Compiled Fortran executables
+/bin/
+
+# IC lookup tables: tracked only in data/, ignored everywhere else
+aomi*.dat
+aomi2*.dat
+romi*.dat
+!/data/**
+
+# Transient outputs from fortran/ build directory
 /fortran/compile.log
 /fortran/breakpoints.dat
 /fortran/1.dat
@@ -27,9 +28,6 @@
 /fortran/hot*.dat
 
 # Working-directory outputs from Perl wrappers
-/perl/aomi*.dat
-/perl/aomi2*.dat
-/perl/romi*.dat
 /perl/tmp.pl
 /perl/*.gp
 /perl/in.dat
