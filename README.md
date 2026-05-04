@@ -5,7 +5,7 @@ This is a set of routines to compute the spectral energy distributions (SEDs) of
 
 These routines use a semi-analytical approach to treat the radiation from the RIAF (also called sometimes advection-dominated accretion flows, ADAFs) in which the accretion flow is considered stationary assuming an α-viscosity and a pseudo-Newtonian gravity, and the radiative transfer is treated in considerable detail, taking into account synchrotron, inverse Compton scattering and bremsstrahlung processes as appropriate for hot plasmas (e.g. [Yuan et al. 2005](https://iopscience.iop.org/article/10.1086/427206); [Nemmen et al. 2006](https://iopscience.iop.org/article/10.1086/500571); [Nemmen et al. 2014](https://academic.oup.com/mnras/article/438/4/2804/2907740)).
 
-The bottleneck of the calculations is in solving the dynamical structure of the flow and computing the inverse Compton radiation. The radiative transfer calculations take advantage of parallel architectures with OpenMP. The expected speedup is `ncores/2` compared with a serial run, where `ncores` is the number of CPU cores in your machine.
+The bottleneck of the calculations is in solving the dynamical structure of the flow and computing the inverse Compton radiation. The radiative transfer calculations take advantage of parallel architectures with OpenMP. 
 
 ![The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).](./docs/m87sed.png) 
 Figure: The dashed line corresponds to the SED calculated for the RIAF around the black hole at the center of galaxy M87, taken from [Wong et al. (2017)](https://ui.adsabs.harvard.edu/abs/2017ApJ...849L..17W/abstract).
@@ -15,13 +15,14 @@ Figure: The dashed line corresponds to the SED calculated for the RIAF around th
 - Fortran compiler (e.g., gfortran) with OpenMP support
 - Perl with modules `Math::Derivative`, `Chart::Gnuplot`
 - Python 3 with Matplotlib for the smoke/regression comparison checks and diagnostic plots
-- Optional: Gnuplot for diagnostic plots
 
 To install the required Perl modules use the commands:
 
-    cpan App::cpanminus
-    sudo cpan Math::Derivative
-    sudo cpan Chart::Gnuplot
+```shell
+cpan App::cpanminus
+sudo cpan Math::Derivative
+sudo cpan Chart::Gnuplot
+```
 
 # Installation
 
@@ -33,9 +34,11 @@ The compiled Fortran binaries will be placed in the `bin/` directory at the repo
 
 Convenience targets at the repository root:
 
-- `make build` — compile the Fortran executables via `fortran/Makefile`
-- `make clean` — remove the compiled Fortran binaries
-- `make smoke` — run the lightweight smoke/regression checks in `tests/smoke.pl`
+```shell
+make build # compile the Fortran executables via `fortran/Makefile`
+make clean # remove the compiled Fortran binaries
+make smoke # run the tests 
+```
 
 # Model description
 
@@ -64,40 +67,38 @@ The units of the parameters are described in the input parameter files included 
 
 ## Model setup
 
-- build the Fortran binaries with `make build`
-- run the Perl wrappers directly from this repository; `perl/run_model.pl`, `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl` now resolve the compiled binaries relative to the repo automatically, so no manual path editing is required
-- cd to the directory that will contain the SED
-- edit the default input file `in.dat`, or prepare another parameter file such as `model.dat`
-- the IC lookup tables (`aomi*.dat`, `romi*.dat`) are staged automatically by `spectrum.pl` from the `data/` directory — no manual copying needed
+1. Build the Fortran binaries with `make build`
+2. `cd` to the directory that will contain the SED
+3. Prepare the parameter file `model.dat` (you can start from the one in `examples/largeR.dat`)
+4. Run the Perl wrappers directly from this repository; `perl/run_model.pl` (or `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl`)
 
 ## Compute SED
 
-For the usual ADAF workflow, use the one-command runner:
+For the usual workflow, use the one-command runner:
 
-    cd /path/to/model-run
-    /path/to/repo/perl/run_model.pl model.dat
+```shell
+cd /path/model-run
+/path/perl/run_model.pl model.dat
+``` 
 
-It computes the dynamics, checks that the solution is physical, computes the spectrum, and writes a SED plot named after the parameter file basename, such as `model.png`, in the current working directory.
+This will compute the dynamics, checks that the solution is physical, compute the spectrum, and write a SED plot named after the parameter file basename, such as `model.png`, in the current working directory.
 
-For manual runs:
+### Manual runs
 
 1. run `perl/dyn.pl` to compute ADAF dynamics to find physical global solution, adjusting range of eigenvalues `sl0i`,`sl0f` if required
 2. once you get a good (physical) global solution in step 1, run `perl/spectrum.pl` to generate ADAF SED
 3. optional: run `perl/ssd.pl` to compute truncated thin disk SED
 
-With no parameter-file argument, the scripts read `in.dat` from the working directory:
+You can pass a parameter file explicitly:
 
-    cd /path/to/model-run
-    perl /path/to/repo/perl/dyn.pl
-    perl /path/to/repo/perl/spectrum.pl
-    perl /path/to/repo/perl/ssd.pl
+```shell
+cd /path/model-run
+perl /path/perl/dyn.pl model.dat
+perl /path/perl/spectrum.pl model.dat
+perl /path/perl/ssd.pl model.dat
+```
 
-You can also pass a parameter file explicitly:
-
-    cd /path/to/model-run
-    perl /path/to/repo/perl/dyn.pl model.dat
-    perl /path/to/repo/perl/spectrum.pl model.dat
-    perl /path/to/repo/perl/ssd.pl model.dat
+With no parameter-file argument, the scripts read `in.dat` from the working directory.
 
 The scripts above are meant to be invoked from the working directory that contains the selected parameter file and, for `spectrum.pl`, the matching `x.dat` produced by `dyn.pl`.
 
