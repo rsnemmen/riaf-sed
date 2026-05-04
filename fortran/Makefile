@@ -15,7 +15,7 @@ $(BINDIR)/dynamics: dynamics.f | $(BINDIR)
 	$(FC) $(FFLAGS) -ffpe-trap=invalid,zero $< -o $@
 
 $(BINDIR)/spectrum: spectrum.f | $(BINDIR)
-	$(FC) $(FFLAGS) -fopenmp $< -o $@
+	$(FC) -O2 -fopenmp $< -o $@
 
 $(BINDIR)/ssd_new: ssd_new.f | $(BINDIR)
 	$(FC) $(FFLAGS) $< -o $@

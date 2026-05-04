@@ -43,6 +43,7 @@ c the fls subroutine
 	common /newnew/y3,y4
 	common mui,mue,m,dotm0,rtran,beta,mc2h
 	common /comp1/nu,ssum
+!$OMP THREADPRIVATE(/comp1/)
 	common /comp2/a1,b1,c1,a2,b2,c2,a3,b3,c3
   	data(nu(i),i=1,200)/200*0.d0/(ssum(i),i=1,200)/200*0.d0/
 
@@ -219,12 +220,46 @@ c-----------------------------
 c       r(n+1)=r(n)/2.
 	    r(n+1)=2.d0
 
+        do 19 j=1,200
+        nnu(j)=0.d0
+        nulu(j)=0.d0
+        nulu2(j)=0.d0
+        nulu3(j)=0.d0
+        nulu4(j)=0.d0
+        nulu5(j)=0.d0
+        nulu6(j)=0.d0
+        nulu7(j)=0.d0
+        su(j)=0.d0
+19      continue
+
+        do 21 j=1,nvmax
+        nnu(j)=10.d0**(9.0+0.12d0*j)
+21      continue
 
         ! biggest loop, goes through radial structure?
         ! ==============================================
+!$OMP PARALLEL DO SCHEDULE(DYNAMIC,1)
+!$OMP& PRIVATE(i,j,jj,l,cs,omigak,h,hh,rhorho,taoes,s,setae,setai)
+!$OMP& PRIVATE(fseta,qbr,redshift,bnu,g1,g2,gaunt,qiabr,xx,fxx)
+!$OMP& PRIVATE(fk2,qiasy,qianu,kapa,taonux,fnu,sigma1,sigma2)
+!$OMP& PRIVATE(eps,fup,flo,kflag,nint,sum,sum2,sum3,sum4,sum5)
+!$OMP& PRIVATE(sum6,sum7,f,sigma,sssum,ssssum,sssssum,ssuumm)
+!$OMP& PRIVATE(ssssss)
+!$OMP& REDUCTION(+:nulu,nulu2,nulu3,nulu4,nulu5,nulu6,nulu7,su)
         do 20 i=1,n
+        do 18 l=1,200
+        nu(l)=0.d0
+        ssum(l)=0.d0
+        sssum(l)=0.d0
+        ssssum(l)=0.d0
+        sssssum(l)=0.d0
+        ssuumm(l)=0.d0
+        ssssss(l)=0.d0
+18      continue
+!$OMP CRITICAL(progress)
         print*,i
         call flush(6)
+!$OMP END CRITICAL(progress)
 
         cs=sqrt(1.d0/beta*ru*(ti(i)/mui+te(i)/mue))
         omigak=1./sqrt(r(i))/(r(i)-2.d0)
@@ -279,7 +314,6 @@ c
 ! the value of dlog(nu) below must match the value of nvmax (number of
 ! steps in SED)
 c *** previously was nnu(j)=10.d0**(10.1+0.15d0*j) 
-        nnu(j)=10.d0**(9.0+0.12d0*j)	!----------------------(8)------------------
 c now we consider the motion and the gravitational redshift
         if(mach(i)*cs.ge.1.) then
           redshift=9.d-1
@@ -383,7 +417,7 @@ c-------------------------------------------------------------------
 
 c here fup, flo denotes the Lorentz factor of electrons
 
-          call simps2(flo,fup,eps,kflag,n,sum,
+          call simps2(flo,fup,eps,kflag,nint,sum,
      $		rhorho,hh,setae,setai,fk2,nu(j),r(i),tau(i))
 	  if(sum.lt.0.) write(*,*) 'issue: sum<0; line 389 in spectrum.f'
 c      pause 'sum<0!!!'
@@ -408,8 +442,6 @@ c the following calculate the second componization |
 c---------------------------------------------------
 	if(jmin .ge. nvmax)  goto 20
 
-!$OMP PARALLEL DO PRIVATE(jj,sum2) SHARED(sssum) 
-!$OMP& REDUCTION(+:nulu2)
 	do 34 jj=jmin,nvmax
 c       call simp2(1.01d0,6.d+1,0.2d0,sum2,
 c    $		rhorho,hh,setae,jj,nu,ssum)
@@ -419,9 +451,8 @@ c    $		rhorho,hh,setae,jj,nu,ssum)
 	nulu2(jj)=nulu2(jj)+nu(jj)*sum2*2.*sigma(i)
      $          *redshift**2.d0
 
- 	sssum(jj)=sum2*1.
+	sssum(jj)=sum2*1.
 34	continue
-!$ OMP END PARALLEL DO
 
 	do 134 l=1,200
 	ssum(l)=sssum(l)
@@ -430,8 +461,6 @@ c---------------------------------------------------
 c the following calculate the third comptonization |
 c---------------------------------------------------
 
-!$OMP PARALLEL DO PRIVATE(jj,sum3) SHARED(ssssum) 
-!$OMP& REDUCTION(+:nulu3)
 	do 35 jj=jmin+5,nvmax
 c       call simp2(1.01d0,6.d+1,0.2d0,sum3,
 c    $          rhorho,hh,setae,jj,nu,sssum)
@@ -443,7 +472,6 @@ c    $          rhorho,hh,setae,jj,nu,sssum)
 
  	ssssum(jj)=sum3*1.
 35      continue
-!$ OMP END PARALLEL DO
 
 	do 135 l=1,200
         ssum(l)=ssssum(l)
@@ -452,8 +480,6 @@ c---------------------------------------------------
 c the following calculate the fourth comptonization |
 c---------------------------------------------------
 
-!$OMP PARALLEL DO PRIVATE(jj,sum4) SHARED(sssssum) 
-!$OMP& REDUCTION(+:nulu4)
         do 36 jj=jmin+15,nvmax
 c       call simp2(1.01d0,8.d+1,0.2d0,sum4,
 c     $          rhorho,hh,setae,jj,nu,ssssum)
@@ -464,7 +490,6 @@ c     $          rhorho,hh,setae,jj,nu,ssssum)
      $          *redshift**2.d0
  	sssssum(jj)=sum4*1.
 36      continue
-!$ OMP END PARALLEL DO
 
 c	print*,'nulu4'
 	do 136 l=1,200
@@ -474,8 +499,6 @@ c---------------------------------------------------
 c the following calculate the fiveth comptonization |
 c---------------------------------------------------
 
-!$OMP PARALLEL DO PRIVATE(jj,sum5) SHARED(ssuumm) 
-!$OMP& REDUCTION(+:nulu5)
         do 37 jj=jmin+15,nvmax
         call simp2(flo,fup,0.2d0,sum5,
      $          rhorho,hh,setae,jj)
@@ -484,7 +507,6 @@ c---------------------------------------------------
      $          *redshift**2.d0
  	ssuumm(jj)=sum5*1.
 37      continue
-!$ OMP END PARALLEL DO
 
 	do 137 l=1,200
         ssum(l)=ssuumm(l)
@@ -493,8 +515,6 @@ c---------------------------------------------------
 c the following calculate the sixth comptonization |
 c---------------------------------------------------
 
-!$OMP PARALLEL DO PRIVATE(jj,sum6) SHARED(ssssss) 
-!$OMP& REDUCTION(+:nulu6)
         do 38 jj=jmin+20,nvmax
 c       call simp2(1.01d0,8.d+1,0.2d0,sum6,
 c    $          rhorho,hh,setae,jj,nu(jj),ssuumm(j))
@@ -506,7 +526,6 @@ c    $          rhorho,hh,setae,jj,nu(jj),ssuumm(j))
 
  	ssssss(jj)=sum6*1.
 38      continue
-!$ OMP END PARALLEL DO
 
 	do 138 l=1,200
         ssum(l)=ssssss(l)
@@ -516,7 +535,6 @@ c---------------------------------------------------
 c the following calculate the seventh comptonization |
 c---------------------------------------------------
 
-!$OMP PARALLEL DO PRIVATE(jj,sum7) REDUCTION(+:nulu7)
         do 39 jj=jmin+35,nvmax
         call simp2(flo,fup,0.2d0,sum7,
      $          rhorho,hh,setae,jj)
@@ -525,11 +543,10 @@ c---------------------------------------------------
      $          *redshift**2.d0
 
 39      continue
-!$ OMP END PARALLEL DO
 
 
 20      continue
-!$ OMP END PARALLEL DO
+!$OMP END PARALLEL DO
 ! end of big loop over radial structure
 !
 
@@ -1242,6 +1259,7 @@ c	function fct(gam,rhorho,hh,setae,jj,nu,ssum)
 c	common mui,mue,m,dotm0,rtran,beta,mc2h
 	double precision nu,mc2h,mbsl4,ssum,s
 	common /comp1/nu,ssum
+!$OMP THREADPRIVATE(/comp1/)
 	common /comp2/a1,b1,c1,a2,b2,c2,a3,b3,c3
 	
 
@@ -1334,7 +1352,11 @@ c--------------------------------------------------------------------
 
         p=1./2./dd*hea
 
+	if(i.eq.1) then
+	delomp=(nu(i+1)-nu(i))/mc2h
+	else
 	delomp=(nu(i+1)-nu(i-1))/mc2h/2.d0
+	endif
 
 c the following calculate R(omip,gam) according to eq. 2.3 
 c	pro1=taoes*(1.-2.*gam*omip(i)/3.*(3.+be*be))
