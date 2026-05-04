@@ -22,8 +22,19 @@
 # and follow the readme instructions to install it.
 use FindBin qw($Bin);
 use lib "$Bin/lib";
-use IPC::Open2;
+use Cwd qw(getcwd);
+use File::Basename qw(basename);
+use File::Copy qw(copy);
+use File::Path qw(make_path);
+use File::Spec;
+use File::Temp qw(tempdir);
+use IO::Select;
+use IPC::Open3;
+use POSIX qw(_exit);
+use Storable qw(retrieve store);
+use Symbol qw(gensym);
 use Math::Derivative qw(Derivative1 Derivative2); 
+use ADAF::Diagnostics qw(classify_solution);
 use ADAF::Paths qw(fortran_binary);
 
 # Module needed to benchmark the execution time of the code
@@ -42,82 +53,17 @@ $dynbinary=fortran_binary($Bin, "dynamics");
 # Initializes gnuplot
 use Chart::Gnuplot;
 
-$sl0=$sl0i;
-# Calculates the increment in sl0 given the desired number of models
-$d_sl0=($sl0f-$sl0i)/$nmodels; # increment
+$search_method = defined $search_method ? lc($search_method) : 'adaptive';
+$eig_tol = defined $eig_tol ? convDbl($eig_tol) : 1e-4;
+$dyn_timeout = defined $dyn_timeout ? convDbl($dyn_timeout) : 30;
+$max_workers = defined $max_workers ? int($max_workers) : 1;
+$max_workers = 1 if $max_workers < 1;
 
-# Stores number of iterations until nice solution is found
-$iterat=1;
-# Stores number of "bracketing conditions" found, i.e. how many times the 
-# intervals of eigenvalues are divided before reaching the physical solution.
-$brackets=0;
-
-# Main loop
-while ($sl0<=$sl0f+$d_sl0) {
-$current_sl0=$sl0;
-
-# Creates header of each log file
-# The output file keeps being rewritten until the final run.
-&header;
-
-# Calls adaf Fortran code and computes dynamical solution
-&dynamics; 
-
-# Diagnose if the computed solution is physical or not
-&diagnose;
-
-# Plots radius x v_r/c_s for the solution
-#&plot;
-
-# Decides if the solution is OK or not, and what should be done next
-if ($increase==1 && $discont==0 && $weirdam==0 && $sonic !~ /Problem!/ && $nan==0 && $nooutput==0) {
-  print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=nice solution\n";
-  $ops=0; # signal that solution was found, used after end of loop
-  last; #  ****EXIT LOOP
-
-  } elsif ( ($increase==0) && ($sonic =~ /Problem!/) ) {
-  $lastok=$sl0; # stores the last eigenvalue computed with no stops or jumps
-  $sl0=$sl0+$d_sl0;
-  print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=subsonic\n";
-  $ops=1;
-  $iterat++;
-
-#  } elsif ($nooutput==1) { 
-#  print "\nNo global solution. Change the OBCs! \n";
-#  $ops=1;
-#  last;
-  
-  } elsif ( $nooutput==1 || ($increase==1 && $sonic =~ /Problem!/) || ($increase==1 && $discont==1) ||  $weirdam==1 || ($discont==1 && $sonic !~ /Problem!/) ) { #  || $nan==1 || ($increase==0 && $sonic !~ /Problem!/)
-
-  if ($nooutput==1) {
-      $status="no global solution; verify the OBCs";
-  } else {
-      $status="bracketing";
-  }
-
-  if ($iterat==1) {
-      print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=bad eigenvalue at 1st iteration; decrease the lower limit\n";
-      $ops=1;
-      last;  }
-
-  $bad=$sl0; # stores the "bad" eigenvalue which caused a jump or hang
-# BRACKET the solution between the last OK eigenvalue and the 
-# current BAD one
-  $sl0f=$sl0;
-  $d_sl0=($bad-$lastok)/$nmodels;
-  $sl0=$lastok+$d_sl0; 
-  print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=$status\n";
-  $iterat++;
-  $brackets++;
-    
-  } else {
-  print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=weird result; check conditions\n";
-  $ops=1;
-  last;
-  
+if ($search_method eq 'legacy') {
+  &legacy_search;
+} else {
+  &adaptive_search;
 }
-
-} 
 
 if ($ops == 1) {
 # To print the diagnostics for the bad solution
@@ -136,6 +82,410 @@ $dbench = timediff($bench1, $bench0);
 print "Runtime: ", timestr($dbench),"\n";
 
 
+
+sub adaptive_search {
+  $iterat=1;
+  $brackets=0;
+  $ops=1;
+
+  my @candidates = coarse_candidates();
+  my @coarse_results = $max_workers > 1 ? run_trials_parallel(@candidates) : ();
+  my %coarse_by_value = map { $_->{eigenvalue} => $_ } @coarse_results;
+  my $last_subsonic;
+
+  foreach my $candidate (@candidates) {
+    my $result = $max_workers > 1 ? $coarse_by_value{$candidate} : run_trial($candidate, getcwd(), File::Spec->rel2abs($diag), 0);
+    die "Missing result for eigenvalue $candidate from parallel search.\n" unless defined $result;
+
+    if ($result->{status} eq 'nice') {
+      report_trial($result);
+      if (defined $last_subsonic) {
+        refine_bracket($last_subsonic->{eigenvalue}, $result->{eigenvalue}, $result);
+        return;
+      }
+      rerun_final_solution($result->{eigenvalue});
+      $ops=0;
+      return;
+    }
+
+    if ($result->{status} eq 'subsonic') {
+      report_trial($result);
+      $last_subsonic = $result;
+      next;
+    }
+
+    if (is_bad_for_bracket($result)) {
+      if (!defined $last_subsonic) {
+        print "iter=$iterat brackets=$brackets eigenvalue=$result->{eigenvalue} status=bad eigenvalue at 1st iteration; decrease the lower limit\n";
+        load_result_globals($result);
+        $sl0=$result->{eigenvalue};
+        return;
+      }
+
+      report_trial($result, 'bracketing');
+      $brackets++;
+      refine_bracket($last_subsonic->{eigenvalue}, $result->{eigenvalue});
+      return;
+    }
+
+    report_trial($result, 'weird result; check conditions');
+    load_result_globals($result);
+    $sl0=$result->{eigenvalue};
+    return;
+  }
+}
+
+
+sub legacy_search {
+  $sl0=$sl0i;
+  # Calculates the increment in sl0 given the desired number of models
+  $d_sl0=($sl0f-$sl0i)/$nmodels; # increment
+
+  # Stores number of iterations until nice solution is found
+  $iterat=1;
+  # Stores number of "bracketing conditions" found, i.e. how many times the
+  # intervals of eigenvalues are divided before reaching the physical solution.
+  $brackets=0;
+
+  # Main loop
+  while ($sl0<=$sl0f+$d_sl0) {
+  $current_sl0=$sl0;
+
+  # Creates header of each log file
+  # The output file keeps being rewritten until the final run.
+  &header;
+
+  # Calls adaf Fortran code and computes dynamical solution
+  &dynamics;
+
+  # Diagnose if the computed solution is physical or not
+  &diagnose;
+
+  # Plots radius x v_r/c_s for the solution
+  #&plot;
+
+  # Decides if the solution is OK or not, and what should be done next
+  if ($increase==1 && $discont==0 && $weirdam==0 && $sonic !~ /Problem!/ && $nan==0 && $nooutput==0) {
+    print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=nice solution\n";
+    $ops=0; # signal that solution was found, used after end of loop
+    last; #  ****EXIT LOOP
+
+    } elsif ( ($increase==0) && ($sonic =~ /Problem!/) ) {
+    $lastok=$sl0; # stores the last eigenvalue computed with no stops or jumps
+    $sl0=$sl0+$d_sl0;
+    print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=subsonic\n";
+    $ops=1;
+    $iterat++;
+
+  #  } elsif ($nooutput==1) {
+  #  print "\nNo global solution. Change the OBCs! \n";
+  #  $ops=1;
+  #  last;
+
+    } elsif ( $nooutput==1 || ($increase==1 && $sonic =~ /Problem!/) || ($increase==1 && $discont==1) ||  $weirdam==1 || ($discont==1 && $sonic !~ /Problem!/) ) { #  || $nan==1 || ($increase==0 && $sonic !~ /Problem!/)
+
+    if ($nooutput==1) {
+        $status="no global solution; verify the OBCs";
+    } else {
+        $status="bracketing";
+    }
+
+    if ($iterat==1) {
+        print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=bad eigenvalue at 1st iteration; decrease the lower limit\n";
+        $ops=1;
+        last;  }
+
+    $bad=$sl0; # stores the "bad" eigenvalue which caused a jump or hang
+  # BRACKET the solution between the last OK eigenvalue and the
+  # current BAD one
+    $sl0f=$sl0;
+    $d_sl0=($bad-$lastok)/$nmodels;
+    $sl0=$lastok+$d_sl0;
+    print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=$status\n";
+    $iterat++;
+    $brackets++;
+
+    } else {
+    print "iter=$iterat brackets=$brackets eigenvalue=$current_sl0 status=weird result; check conditions\n";
+    $ops=1;
+    last;
+
+  }
+
+  }
+}
+
+
+sub coarse_candidates {
+  my @candidates;
+  my $steps = int($nmodels);
+  $steps = 1 if $steps < 1;
+  my $step = ($sl0f - $sl0i) / $steps;
+
+  for my $i (0 .. $steps) {
+    push @candidates, $sl0i + $i * $step;
+  }
+
+  return @candidates;
+}
+
+
+sub refine_bracket {
+  my ($low, $high, $best_nice) = @_;
+
+  while (abs($high - $low) > $eig_tol) {
+    my $step = ($high - $low) / $nmodels;
+    last if $step <= 0;
+    my $last_subsonic = $low;
+    my $advanced = 0;
+
+    for (my $candidate = $low + $step; $candidate <= $high + $step / 10.0; $candidate += $step) {
+      $candidate = $high if $candidate > $high;
+      my $result = run_trial($candidate, getcwd(), File::Spec->rel2abs($diag), 0);
+
+      if ($result->{status} eq 'nice') {
+        report_trial($result);
+        rerun_final_solution($result->{eigenvalue});
+        $ops=0;
+        return;
+      }
+
+      if ($result->{status} eq 'subsonic') {
+        report_trial($result);
+        $last_subsonic = $result->{eigenvalue};
+        $advanced = 1;
+        next;
+      }
+
+      if (is_bad_for_bracket($result)) {
+        report_trial($result, 'bracketing');
+        $low = $last_subsonic;
+        $high = $result->{eigenvalue};
+        $brackets++;
+        $advanced = 1;
+        last;
+      }
+
+      report_trial($result, 'weird result; check conditions');
+      load_result_globals($result);
+      $sl0=$result->{eigenvalue};
+      return;
+    }
+
+    last unless $advanced;
+  }
+
+  if (defined $best_nice) {
+    rerun_final_solution($best_nice->{eigenvalue});
+    $ops=0;
+    return;
+  }
+
+  $sl0=$low;
+  $sonic='Problem!';
+  $largest='Problem!';
+  $largestR='Problem!';
+  $nooutput=1;
+}
+
+
+sub run_trials_parallel {
+  my @candidates = @_;
+  my $root = tempdir('dyn-search-XXXX', TMPDIR => 1, CLEANUP => 1);
+  my @pending = @candidates;
+  my %children;
+  my @results;
+
+  while (@pending || keys %children) {
+    while (@pending && keys(%children) < $max_workers) {
+      my $candidate = shift @pending;
+      my $workdir = File::Spec->catdir($root, "trial-$candidate");
+      make_path($workdir);
+      prepare_trial_directory($workdir);
+      my $result_file = File::Spec->catfile($root, "trial-$candidate.storable");
+      my $pid = fork();
+      die "Can't fork: $!\n" unless defined $pid;
+
+      if ($pid == 0) {
+        my $result = run_trial($candidate, $workdir, File::Spec->catfile($workdir, basename($diag)), 0);
+        store($result, $result_file);
+        _exit(0);
+      }
+
+      $children{$pid} = $result_file;
+    }
+
+    my $done = wait();
+    last if $done == -1;
+    my $result_file = delete $children{$done};
+    push @results, retrieve($result_file) if defined $result_file && -e $result_file;
+  }
+
+  return sort { $a->{eigenvalue} <=> $b->{eigenvalue} } @results;
+}
+
+
+sub prepare_trial_directory {
+  my ($workdir) = @_;
+  my $cwd = getcwd();
+
+  foreach my $support_file (qw(hot.dat)) {
+    my $source = File::Spec->catfile($cwd, $support_file);
+    next unless -e $source;
+    my $target = File::Spec->catfile($workdir, $support_file);
+    symlink($source, $target) || copy($source, $target) || die "Can't stage $source in $workdir: $!\n";
+  }
+}
+
+
+sub run_trial {
+  my ($trial_sl0, $workdir, $trial_diag, $keep_output) = @_;
+
+  header($trial_diag, $trial_sl0);
+  my ($timed_out, $exit_status) = run_dynamics($trial_sl0, $workdir, $trial_diag);
+  my $result = classify_solution($trial_diag);
+  $result->{eigenvalue} = $trial_sl0;
+  $result->{timed_out} = $timed_out;
+  $result->{exit_status} = $exit_status;
+  $result->{status} = trial_status($result);
+
+  unlink $trial_diag if !$keep_output && $trial_diag ne File::Spec->rel2abs($diag);
+
+  return $result;
+}
+
+
+sub trial_status {
+  my ($result) = @_;
+
+  return 'timeout' if $result->{timed_out};
+  return 'nice' if $result->{is_nice};
+  return 'subsonic' if $result->{increase} == 0 && $result->{sonic} eq 'Problem!';
+  return 'bad' if is_bad_for_bracket($result);
+  return 'weird';
+}
+
+
+sub is_bad_for_bracket {
+  my ($result) = @_;
+
+  return 1 if $result->{status} && $result->{status} eq 'timeout';
+  return 1 if $result->{nooutput};
+  return 1 if $result->{nan};
+  return 1 if $result->{failed};
+  return 1 if $result->{weirdam};
+  return 1 if $result->{increase} == 1 && $result->{sonic} eq 'Problem!';
+  return 1 if $result->{increase} == 1 && $result->{discont} == 1;
+  return 1 if $result->{discont} == 1 && $result->{sonic} ne 'Problem!';
+
+  return 0;
+}
+
+
+sub report_trial {
+  my ($result, $override_status) = @_;
+  my $status = defined $override_status ? $override_status : $result->{status};
+  $status = 'nice solution' if $status eq 'nice';
+  $status = 'no global solution; verify the OBCs' if $status eq 'bad' && $result->{nooutput};
+  print "iter=$iterat brackets=$brackets eigenvalue=$result->{eigenvalue} status=$status\n";
+  $iterat++;
+}
+
+
+sub rerun_final_solution {
+  my ($final_sl0) = @_;
+
+  my $result = run_trial($final_sl0, getcwd(), File::Spec->rel2abs($diag), 1);
+  load_result_globals($result);
+  $sl0=$final_sl0;
+}
+
+
+sub load_result_globals {
+  my ($result) = @_;
+
+  $nooutput=$result->{nooutput};
+  $sonic=$result->{sonic};
+  $largest=$result->{largest};
+  $largestR=$result->{largestR};
+  $linesout=$result->{linesout};
+  $increase=$result->{increase};
+  $discont=$result->{discont};
+  $weirdam=$result->{weirdam};
+  $nan=$result->{nan};
+  $failed=$result->{failed};
+}
+
+
+sub run_dynamics {
+  my ($trial_sl0, $workdir, $trial_diag) = @_;
+  my $reader;
+  my $err = gensym;
+  my $oldcwd = getcwd();
+  my $timed_out = 0;
+  my $exit_status = 0;
+  my $pid;
+
+  chdir $workdir or die "Can't chdir to $workdir: $!\n";
+  $pid = open3(\*DYN, $reader, $err, $dynbinary);
+  chdir $oldcwd or die "Can't chdir back to $oldcwd: $!\n";
+
+  # Passes arguments to the fortran code
+  print DYN "$gamai \n";
+  print DYN "$m \n";
+  print DYN "$beta \n";
+  print DYN "$alfa \n";
+  print DYN "$delta \n";
+  print DYN "$dotm0 \n";
+  print DYN "$rout \n";
+  print DYN "$pp0 \n";
+  print DYN "$ti \n";
+  print DYN "$te \n";
+  print DYN "$vcs \n";
+  print DYN "$trial_sl0 \n";
+
+  close(DYN);
+
+  open (LOGAPPEND, ">>$trial_diag") ||
+    die "Can't open $trial_diag !";
+
+  my $ok = eval {
+    local $SIG{ALRM} = sub { die "dyn_timeout\n"; };
+    alarm($dyn_timeout);
+
+    my $selector = IO::Select->new($reader, $err);
+    while (my @ready = $selector->can_read) {
+      foreach my $fh (@ready) {
+        my $bytes = sysread($fh, my $buffer, 4096);
+        if ($bytes) {
+          print LOGAPPEND $buffer;
+        } else {
+          $selector->remove($fh);
+          close($fh);
+        }
+      }
+    }
+
+    waitpid($pid, 0);
+    $exit_status = $?;
+    alarm(0);
+    1;
+  };
+
+  if (!$ok) {
+    alarm(0);
+    $timed_out = 1 if $@ =~ /dyn_timeout/;
+    kill 'TERM', $pid;
+    sleep 1;
+    kill 'KILL', $pid;
+    waitpid($pid, 0);
+    $exit_status = $?;
+  }
+
+  close(LOGAPPEND);
+
+  return ($timed_out, $exit_status);
+}
 
 
 
@@ -265,49 +615,7 @@ foreach (@x) {
 
 # Calls adaf Fortran code and computes dynamical solution
 sub dynamics {
-my $reader;
-my $pid = open2($reader, \*DYN, $dynbinary);
-
-# Passes arguments to the fortran code
-# Adiabatic index gamma
-print DYN "$gamai \n";
-# Black hole mass (in Solar masses)
-print DYN "$m \n";
-# ratio of gas to total pressure
-print DYN "$beta \n";
-# alpha viscosity
-print DYN "$alfa \n";
-# Fraction of turbulent dissipation that directly heats electrons
-print DYN "$delta \n";
-# Mdot_out (Eddington units)
-print DYN "$dotm0 \n";
-# R_out (units of R_S)
-print DYN "$rout \n";
-# p_wind ("strength of wind")
-print DYN "$pp0 \n";
-
-# Boundary conditions *******************
-# T_i (ion temperature)
-print DYN "$ti \n";
-# T_e (electron temperature)
-print DYN "$te \n";
-# v_R/c_s (radial velocity/sound speed)
-print DYN "$vcs \n";
-# eigenvalue of the problem (the "shooting" parameter)
-print DYN "$sl0 \n";
-
-close(DYN);
-
-open (LOGAPPEND, ">>$diag") || 
-  die "Can't open $diag !";
-
-while (<$reader>) {
-  print LOGAPPEND $_;
-}
-
-close($reader);
-close(LOGAPPEND);
-waitpid($pid, 0);
+run_dynamics($sl0, getcwd(), File::Spec->rel2abs($diag));
 }
 
 
@@ -319,13 +627,16 @@ waitpid($pid, 0);
 
 # Prints header of each solution
 sub header {
+my ($header_diag, $header_sl0) = @_;
+$header_diag = $diag unless defined $header_diag;
+$header_sl0 = $sl0 unless defined $header_sl0;
 # Some auxiliary calculations (needed only for the header of the log file)
 #
 # Virial temperature at the outer boundary
 #$tvir=0.5444091492e13*(convDbl($gamai)-1.)/convDbl($rout);
 
 # Prints header of log file
-open (LOGFILE, ">$diag");
+open (LOGFILE, ">$header_diag");
 print LOGFILE "# Input parameters for ADAF model: \n";
 print LOGFILE "# $gamai - gamma - adiabatic index \n";
 print LOGFILE "# $m - m - black hole mass (in 10^6 Solar masses) \n";
@@ -339,7 +650,7 @@ print LOGFILE "# BOUNDARY CONDITIONS *********** \n";
 print LOGFILE "# " . (convDbl($ti)/$tvir) . " - T_i/T_vir - ion temperature \n";
 print LOGFILE "# " . (convDbl($te)/$tvir) . " - T_e/T_vir - electron temperature \n";
 print LOGFILE "# $vcs - v_R/c_s - radial velocity/sound speed \n";
-print LOGFILE "# $sl0 - eigenvalue of the problem (\"shooting\" parameter) \n";
+print LOGFILE "# $header_sl0 - eigenvalue of the problem (\"shooting\" parameter) \n";
 print LOGFILE "# \n";
 print LOGFILE "# Auxiliary values: \n";
 print LOGFILE "# " . ($tvir/1e9) . "e+9 - T_vir - Virial temperature at the outer boundary \n";
@@ -459,6 +770,10 @@ while (<PARFILE>) {
       if ($fields[0] =~ /^sl0i$/) {$sl0i=$fields[1];}
       if ($fields[0] =~ /^sl0f$/) {$sl0f=$fields[1];}
       if ($fields[0] =~ /^nmodels$/) {$nmodels=$fields[1];}
+      if ($fields[0] =~ /^search_method$/) {$search_method=$fields[1];}
+      if ($fields[0] =~ /^eig_tol$/) {$eig_tol=$fields[1];}
+      if ($fields[0] =~ /^dyn_timeout$/) {$dyn_timeout=$fields[1];}
+      if ($fields[0] =~ /^max_workers$/) {$max_workers=$fields[1];}
       if ($fields[0] =~ /^ti$/) {$ti=$fields[1];}
       if ($fields[0] =~ /^te$/) {$te=$fields[1];}
       if ($fields[0] =~ /^vcs$/) {$vcs=$fields[1];}
