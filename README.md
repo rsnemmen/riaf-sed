@@ -14,7 +14,7 @@ Figure: The dashed line corresponds to the SED calculated for the RIAF around th
 
 - Fortran compiler (e.g., gfortran) with OpenMP support
 - Perl with modules `Math::Derivative`, `Chart::Gnuplot`
-- Python 3 with Matplotlib for the smoke/regression comparison checks and diagnostic plot
+- Python 3 with Matplotlib for the smoke/regression comparison checks and diagnostic plots
 - Optional: Gnuplot for diagnostic plots
 
 To install the required Perl modules use the commands:
@@ -121,7 +121,7 @@ Run the lightweight smoke/regression checks against the bundled fixtures and exa
 
     make smoke
 
-This command rebuilds the Fortran binaries, checks representative "nice" and "bad" dynamical solutions from `tests/testcases_for_code/`, verifies the bundled `tests/n1097/` and `tests/m81/` example outputs are still parseable and physically plausible, and runs `perl/dyn.pl examples/largeR.dat` to compare all 15 radial-profile columns against the fiducial solution in `tests/reference/largeR_dyn.out`. It also writes a gridded diagnostic plot to `tests/artifacts/largeR_dynamics.png`.
+This command rebuilds the Fortran binaries, checks representative "nice" and "bad" dynamical solutions from `tests/testcases_for_code/`, verifies the bundled `tests/n1097/` and `tests/m81/` example outputs are still parseable and physically plausible, and runs the `examples/largeR.dat` dynamics and spectrum workflow. It compares all 15 radial-profile columns against `tests/reference/largeR_dyn.out`, compares the generated spectrum against `tests/reference/largeR_spectrum.out`, and writes diagnostic plots to `tests/artifacts/largeR_dynamics.png` and `tests/artifacts/largeR_spectrum.png`.
 
 
 # Citation
@@ -152,7 +152,7 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 
 By order of priority:
 
-- [ ] include scripts for plotting the SEDs
+- [ ] include general-purpose user scripts for plotting SEDs
 - [ ] port the core fortran code to C and better organize it
 - [ ] add nonthermal emission
 - [ ] OpenACC version for radiative transfer

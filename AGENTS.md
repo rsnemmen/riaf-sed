@@ -8,13 +8,13 @@ This repository computes ADAF/RIAF dynamics and spectra using Fortran solvers wi
 - `perl/`: user-facing wrappers and workflow scripts. Shared Perl modules live in `perl/lib/ADAF/`.
 - `data/`: canonical inverse-Compton lookup tables staged automatically by `spectrum.pl`.
 - `examples/`: tracked parameter files, including `largeR.dat` and `smallR.dat`.
-- `tests/`: smoke tests, reference dynamics profiles, saved example outputs, and comparison utilities.
+- `tests/`: smoke tests, reference dynamics/spectrum outputs, saved example outputs, and comparison utilities.
 - `bin/`: generated Fortran binaries from `make build`; do not commit generated binaries.
 
 ## Build, Test, and Development Commands
 
 - `make build`: compile all Fortran executables into `bin/`.
-- `make smoke`: build binaries and run smoke/regression checks, including the `largeR` profile comparison and plot artifact.
+- `make smoke`: build binaries and run smoke/regression checks, including the `largeR` dynamics/spectrum comparisons and plot artifacts.
 - `make clean`: remove compiled binaries and Fortran build artifacts.
 - `make clean-data`: remove top-level generated data products from test/model runs.
 - Example run: `perl perl/dyn.pl examples/largeR.dat`.
@@ -29,9 +29,9 @@ Use descriptive filenames matching existing patterns: `out_*` for dynamics outpu
 
 ## Testing Guidelines
 
-The primary test entry point is `make smoke`. It validates good/bad dynamics fixtures, bundled example spectra, and compares `perl/dyn.pl examples/largeR.dat` against `tests/reference/largeR_dyn.out` using `tests/compare_dynamics.py`. It writes `tests/artifacts/largeR_dynamics.png` for inspection.
+The primary test entry point is `make smoke`. It validates good/bad dynamics fixtures, bundled example spectra, compares `perl/dyn.pl examples/largeR.dat` against `tests/reference/largeR_dyn.out` using `tests/compare_dynamics.py`, and compares the corresponding `perl/spectrum.pl examples/largeR.dat` output against `tests/reference/largeR_spectrum.out` using `tests/compare_spectrum.py`. It writes `tests/artifacts/largeR_dynamics.png` and `tests/artifacts/largeR_spectrum.png` for inspection.
 
-When changing dynamics behavior, regenerate the fiducial only if the numerical change is intentional and scientifically reviewed. Preserve diagnostic failures that catch nonphysical solutions.
+When changing dynamics or spectral behavior, regenerate fiducials only if the numerical change is intentional and scientifically reviewed. Preserve diagnostic failures that catch nonphysical solutions.
 
 ## Commit & Pull Request Guidelines
 
