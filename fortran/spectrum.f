@@ -224,6 +224,7 @@ c       r(n+1)=r(n)/2.
         ! ==============================================
         do 20 i=1,n
         print*,i
+        call flush(6)
 
         cs=sqrt(1.d0/beta*ru*(ti(i)/mui+te(i)/mue))
         omigak=1./sqrt(r(i))/(r(i)-2.d0)
@@ -1590,4 +1591,3 @@ c	romip=3./8./gam1/omip1*log(4.*gam1*omip1)
 8       Z(K)=W
         RETURN
         END
-
