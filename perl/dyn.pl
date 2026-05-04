@@ -35,17 +35,20 @@ use Storable qw(retrieve store);
 use Symbol qw(gensym);
 use Math::Derivative qw(Derivative1 Derivative2); 
 use ADAF::Diagnostics qw(classify_solution);
-use ADAF::Paths qw(fortran_binary);
+use ADAF::Paths qw(fortran_binary parameter_file_from_args);
 
 # Module needed to benchmark the execution time of the code
 use Benchmark; # see http://perldoc.perl.org/Benchmark.html
 $bench0 = new Benchmark;
 
-# Path to ADAF dynamics executable
-$dynbinary=fortran_binary($Bin, "dynamics");
+# Parameter file
+$input=parameter_file_from_args($0, @ARGV);
 
 # Gets values of parameters from external parameter file
 &readParam;
+
+# Path to ADAF dynamics executable
+$dynbinary=fortran_binary($Bin, "dynamics");
 
 # Determines the outer boundary conditions
 &findBCs;
@@ -755,11 +758,8 @@ $te=$te*$tvir . "d0";
 # values of the parameters from this file.
 sub readParam {
 
-# Parameter file
-$input="in.dat";
-
 open (PARFILE, $input) || 
-  die "Can't open $input !";
+  die "Can't open $input: $!\n";
 
 # The field separator is "=". It is important that the input values in the
 # parameter file are in the strict format "var=value" (no quotes).

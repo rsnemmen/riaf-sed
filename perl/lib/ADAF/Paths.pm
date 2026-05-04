@@ -8,7 +8,16 @@ use Exporter qw(import);
 use File::Copy qw(copy);
 use File::Spec;
 
-our @EXPORT_OK = qw(fortran_binary stage_data_files);
+our @EXPORT_OK = qw(fortran_binary parameter_file_from_args stage_data_files);
+
+sub parameter_file_from_args {
+    my ($script_name, @args) = @_;
+
+    $script_name = 'script' unless defined $script_name && length $script_name;
+    die "Usage: $script_name [parameter-file]\n" if @args > 1;
+
+    return @args ? $args[0] : 'in.dat';
+}
 
 sub fortran_binary {
     my ($script_dir, $binary_name) = @_;

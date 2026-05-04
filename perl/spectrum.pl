@@ -9,7 +9,7 @@
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Math::Derivative qw(Derivative1 Derivative2);
-use ADAF::Paths qw(fortran_binary stage_data_files);
+use ADAF::Paths qw(fortran_binary parameter_file_from_args stage_data_files);
 use Cwd qw(getcwd);
 
 # Needed so that I can plot with Gnuplot
@@ -22,6 +22,12 @@ $bench0 = new Benchmark;
 # Module needed for copying files without using an external program
 use File::Copy;
 
+# Parameter file
+$input=parameter_file_from_args($0, @ARGV);
+
+# Gets values of parameters from external parameter file
+&readParam;
+
 # Path to ADAF spectrum executable
 $specbin=fortran_binary($Bin, "spectrum");
 
@@ -30,9 +36,6 @@ stage_data_files($Bin, getcwd(),
     qw(aomi-1.dat aomi-2.dat aomi-3.dat
        aomi2-1.dat aomi2-2.dat aomi2-3.dat
        romi-1.dat romi-2.dat romi-3.dat));
-
-# Gets values of parameters from external parameter file
-&readParam;
 
 # Gets the number of lines of data in the output file from the dynamics
 # code.
@@ -107,11 +110,8 @@ sub convDbl {
 # values of the parameters from this file.
 sub readParam {
 
-# Parameter file
-$input="in.dat";
-
 open (PARFILE, $input) || 
-	die "Can't open $input !";
+	die "Can't open $input: $!\n";
 
 # The field separator is "=". It is important that the input values in the
 # parameter file are in the strict format "var=value" (no quotes).

@@ -24,14 +24,14 @@ The top-level `Makefile` delegates to `fortran/Makefile`, which outputs binaries
 
 ## Typical Workflow
 
-All runs happen in a working directory containing `in.dat`. Build the Fortran binaries first with `make build`; the Perl wrappers resolve binaries from `bin/` and automatically symlink the IC lookup tables from `data/` into the working directory — no manual copying required.
+All runs happen in a working directory containing a parameter file. With no argument, the main wrappers read `in.dat`; they can also take one positional parameter file such as `model.dat`. Build the Fortran binaries first with `make build`; the Perl wrappers resolve binaries from `bin/` and automatically symlink the IC lookup tables from `data/` into the working directory — no manual copying required.
 
-1. Edit `in.dat` with model parameters
-2. Find physical global solution: `perl /path/to/perl/dyn.pl`
-3. Compute SED: `perl /path/to/perl/spectrum.pl`
-4. Optional thin disk SED: `perl /path/to/perl/ssd.pl`
+1. Edit `in.dat` with model parameters, or prepare `model.dat`
+2. Find physical global solution: `perl /path/to/perl/dyn.pl` or `perl /path/to/perl/dyn.pl model.dat`
+3. Compute SED: `perl /path/to/perl/spectrum.pl` or `perl /path/to/perl/spectrum.pl model.dat`
+4. Optional thin disk SED: `perl /path/to/perl/ssd.pl` or `perl /path/to/perl/ssd.pl model.dat`
 
-Use `examples/largeR.dat` or `examples/smallR.dat` as `in.dat` templates.
+Use `examples/largeR.dat` or `examples/smallR.dat` as templates, either copied to `in.dat` or passed explicitly.
 
 ## Architecture
 
@@ -39,10 +39,10 @@ The code uses a shooting method (boundary value problem) to find the global dyna
 
 **Data flow:**
 ```
-in.dat → dyn.pl → dynamics (Fortran) → x.dat (radial structure)
-                                              ↓
-                             spectrum.pl → spectrum (Fortran) → spectrum.dat
-                             ssd.pl      → ssd_alone (Fortran) → *_ssd
+in.dat or model.dat → dyn.pl → dynamics (Fortran) → x.dat (radial structure)
+                                                        ↓
+                                       spectrum.pl → spectrum (Fortran) → spectrum.dat
+                                       ssd.pl      → ssd_alone (Fortran) → *_ssd
 ```
 
 **Key components:**
@@ -101,7 +101,7 @@ If many `NaN`/`FAILED!` results appear, try slightly adjusting boundary conditio
 
 ## Parallelization Strategy
 
-For parameter space exploration, use "dumb parallelization": create separate run directories (`run01/`, `run02/`, etc.), each with its own `in.dat`, and run `dyn.pl` simultaneously in separate terminal tabs.
+For parameter space exploration, use "dumb parallelization": create separate run directories (`run01/`, `run02/`, etc.), each with its own `in.dat` or custom parameter file, and run `dyn.pl` simultaneously in separate terminal tabs.
 
 ## Dependencies
 

@@ -8,9 +8,12 @@ use File::Spec;
 use FindBin qw($Bin);
 use lib File::Spec->catdir($Bin, File::Spec->updir(), 'perl', 'lib');
 use ADAF::Diagnostics qw(classify_solution);
+use ADAF::Paths qw(parameter_file_from_args);
 
 my $repo_root = abs_path(File::Spec->catdir($Bin, File::Spec->updir()));
 my $fortran_dir = File::Spec->catdir($repo_root, 'fortran');
+
+test_parameter_file_selector();
 
 run_command('make', '-C', $fortran_dir);
 
@@ -63,6 +66,20 @@ print "Smoke checks passed.\n";
 sub run_command {
     my (@command) = @_;
     system(@command) == 0 or die "Command failed: @command\n";
+}
+
+sub test_parameter_file_selector {
+    my $default = parameter_file_from_args('dyn.pl');
+    die "No-argument parameter selection should use in.dat.\n" unless $default eq 'in.dat';
+
+    my $custom = parameter_file_from_args('dyn.pl', 'model.dat');
+    die "One-argument parameter selection should use that file.\n" unless $custom eq 'model.dat';
+
+    my $error;
+    eval { parameter_file_from_args('dyn.pl', 'model.dat', 'extra.dat'); };
+    $error = $@;
+    die "Multiple parameter arguments should fail with usage.\n"
+        unless $error =~ /^Usage: dyn\.pl \[parameter-file\]/;
 }
 
 sub validate_spectrum {

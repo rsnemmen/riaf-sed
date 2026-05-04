@@ -66,7 +66,7 @@ The units of the parameters are described in the input parameter files included 
 - build the Fortran binaries with `make build`
 - run the Perl wrappers directly from this repository; `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl` now resolve the compiled binaries relative to the repo automatically, so no manual path editing is required
 - cd to the directory that will contain the SED
-- edit the input file `in.dat` with the desired model parameters
+- edit the default input file `in.dat`, or prepare another parameter file such as `model.dat`
 - the IC lookup tables (`aomi*.dat`, `romi*.dat`) are staged automatically by `spectrum.pl` from the `data/` directory — no manual copying needed
 
 ## Compute SED
@@ -75,12 +75,21 @@ The units of the parameters are described in the input parameter files included 
 2. once you get a good (physical) global solution in step 1, run `perl/spectrum.pl` to generate ADAF SED 
 3. optional: run `perl/ssd.pl` to compute truncated thin disk SED
 
-The scripts above are meant to be invoked from the working directory that contains `in.dat`, `x.dat`, and the interpolation tables, for example:
+With no parameter-file argument, the scripts read `in.dat` from the working directory:
 
     cd /path/to/model-run
     perl /path/to/repo/perl/dyn.pl
     perl /path/to/repo/perl/spectrum.pl
     perl /path/to/repo/perl/ssd.pl
+
+You can also pass a parameter file explicitly:
+
+    cd /path/to/model-run
+    perl /path/to/repo/perl/dyn.pl model.dat
+    perl /path/to/repo/perl/spectrum.pl model.dat
+    perl /path/to/repo/perl/ssd.pl model.dat
+
+The scripts above are meant to be invoked from the working directory that contains the selected parameter file and, for `spectrum.pl`, the matching `x.dat` produced by `dyn.pl`.
 
 If you are having trouble finding a global solution, try playing around with `dyntype.pl`. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.
 
@@ -91,7 +100,7 @@ Two examples of input parameter files are included in the `examples` folder:
 - `largeR.dat`: ADAF with *R_out=1E4 Rs*
 - `smallR.dat`: *R_out=500 Rs*
 
-In order to compute the corresponding models, please rename the files to `in.dat` before running.
+In order to compute the corresponding models, either copy one to `in.dat` or pass the file explicitly, for example `perl /path/to/repo/perl/dyn.pl /path/to/repo/examples/largeR.dat`.
  
 
 
