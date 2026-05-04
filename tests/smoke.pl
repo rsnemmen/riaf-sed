@@ -5,6 +5,7 @@ use warnings;
 
 use Cwd qw(abs_path);
 use File::Spec;
+use File::Temp qw(tempdir);
 use FindBin qw($Bin);
 use lib File::Spec->catdir($Bin, File::Spec->updir(), 'perl', 'lib');
 use ADAF::Diagnostics qw(classify_solution);
@@ -16,6 +17,8 @@ my $fortran_dir = File::Spec->catdir($repo_root, 'fortran');
 test_parameter_file_selector();
 
 run_command('make', '-C', $fortran_dir);
+
+test_largeR_dynamics_regression();
 
 my $fixtures_dir = File::Spec->catdir($repo_root, 'tests', 'testcases_for_code');
 my @good_fixtures = qw(out_nice.dat out_nice03.dat out_nice04.dat);
@@ -66,6 +69,34 @@ print "Smoke checks passed.\n";
 sub run_command {
     my (@command) = @_;
     system(@command) == 0 or die "Command failed: @command\n";
+}
+
+sub test_largeR_dynamics_regression {
+    my $workdir = tempdir('adaf-dyn-XXXX', TMPDIR => 1, CLEANUP => 1);
+    my $dyn_script = File::Spec->catfile($repo_root, 'perl', 'dyn.pl');
+    my $input = File::Spec->catfile($repo_root, 'examples', 'largeR.dat');
+    my $candidate = File::Spec->catfile($workdir, 'out');
+    my $reference = File::Spec->catfile($repo_root, 'tests', 'reference', 'largeR_dyn.out');
+    my $comparator = File::Spec->catfile($repo_root, 'tests', 'compare_dynamics.py');
+
+    run_command_in_dir($workdir, 'perl', $dyn_script, $input);
+
+    my $result = classify_solution($candidate);
+    die "$candidate should pass the dyn.pl-style diagnostics.\n" unless $result->{is_nice};
+    die "$candidate should have 91 profile shells.\n" unless $result->{linesout} == 91;
+
+    run_command('python3', $comparator, $reference, $candidate);
+}
+
+sub run_command_in_dir {
+    my ($workdir, @command) = @_;
+    my $oldcwd = Cwd::getcwd();
+
+    chdir $workdir or die "Can't chdir to $workdir: $!\n";
+    my $ok = system(@command) == 0;
+    chdir $oldcwd or die "Can't chdir back to $oldcwd: $!\n";
+
+    die "Command failed: @command\n" unless $ok;
 }
 
 sub test_parameter_file_selector {
