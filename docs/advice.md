@@ -31,7 +31,7 @@ I open one terminal with three tabs corresponding to each folder (or three termi
 
 The image below shows a screenshot of OS X during a typical parallel run. 
 
-![OS X running code in parallel](../docs/osxparallel.png =300x) 
+![OS X running code in parallel](osxparallel.png) 
 
 
 
