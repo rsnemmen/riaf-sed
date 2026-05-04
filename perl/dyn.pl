@@ -68,11 +68,11 @@ if ($search_method eq 'legacy') {
 if ($ops == 1) {
 # To print the diagnostics for the bad solution
   print "\nNo solution found within the eigenvalue interval. Try changing the OBCs, or range/step of eigenvalues. \n";
-  print "Final eigenvalue=$sl0 status=failed no_output=$nooutput sonic=$sonic mach_max=$largest r_mach_max=$largestR \n";
+  print "Final eigenvalue=$sl0 status=failed no_output=$nooutput sonic=" . format_final_display_value($sonic) . " mach_max=" . format_final_display_value($largest) . " r_mach_max=" . format_final_display_value($largestR) . " \n";
 } else {
 # To print the diagnostics for the nice solution
   print "\nSolution found. \n";
-  print "Final eigenvalue=$sl0 status=ok no_output=$nooutput sonic=$sonic mach_max=$largest r_mach_max=$largestR shells=$linesout \n";
+  print "Final eigenvalue=$sl0 status=ok no_output=$nooutput sonic=" . format_final_display_value($sonic) . " mach_max=" . format_final_display_value($largest) . " r_mach_max=" . format_final_display_value($largestR) . " shells=$linesout \n";
 }
 print "Output file: $diag \n";
 
@@ -81,6 +81,15 @@ $bench1 = new Benchmark;
 $dbench = timediff($bench1, $bench0);
 print "Runtime: ", timestr($dbench),"\n";
 
+
+
+sub format_final_display_value {
+  my ($value) = @_;
+
+  return $value unless defined $value;
+  return sprintf("%.1f", $value) if $value =~ /^\s*[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eEdD][-+]?\d+)?\s*$/;
+  return $value;
+}
 
 
 sub adaptive_search {
