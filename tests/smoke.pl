@@ -19,6 +19,7 @@ test_parameter_file_selector();
 run_command('make', '-C', $fortran_dir);
 
 test_largeR_dynamics_regression();
+test_largeR_spectrum_regression();
 
 my $fixtures_dir = File::Spec->catdir($repo_root, 'tests', 'testcases_for_code');
 my @good_fixtures = qw(out_nice.dat out_nice03.dat out_nice04.dat);
@@ -87,6 +88,31 @@ sub test_largeR_dynamics_regression {
     die "$candidate should pass the dyn.pl-style diagnostics.\n" unless $result->{is_nice};
     die "$candidate should have 91 profile shells.\n" unless $result->{linesout} == 91;
 
+    run_command('python3', $comparator, $reference, $candidate);
+    run_command('python3', $plotter, $reference, $candidate, $plot);
+}
+
+sub test_largeR_spectrum_regression {
+    my $workdir = tempdir('adaf-spectrum-XXXX', TMPDIR => 1, CLEANUP => 1);
+    my $dyn_script = File::Spec->catfile($repo_root, 'perl', 'dyn.pl');
+    my $spectrum_script = File::Spec->catfile($repo_root, 'perl', 'spectrum.pl');
+    my $input = File::Spec->catfile($repo_root, 'examples', 'largeR.dat');
+    my $dynamics_candidate = File::Spec->catfile($workdir, 'out');
+    my $candidate = File::Spec->catfile($workdir, 'spectrum');
+    my $reference = File::Spec->catfile($repo_root, 'tests', 'reference', 'largeR_spectrum.out');
+    my $comparator = File::Spec->catfile($repo_root, 'tests', 'compare_spectrum.py');
+    my $plotter = File::Spec->catfile($repo_root, 'tests', 'plot_spectrum.py');
+    my $plot = File::Spec->catfile($repo_root, 'tests', 'artifacts', 'largeR_spectrum.png');
+
+    run_command_in_dir($workdir, 'perl', $dyn_script, $input);
+
+    my $result = classify_solution($dynamics_candidate);
+    die "$dynamics_candidate should pass the dyn.pl-style diagnostics.\n"
+        unless $result->{is_nice};
+    die "$dynamics_candidate should have 91 profile shells.\n"
+        unless $result->{linesout} == 91;
+
+    run_command_in_dir($workdir, 'perl', $spectrum_script, $input);
     run_command('python3', $comparator, $reference, $candidate);
     run_command('python3', $plotter, $reference, $candidate, $plot);
 }
