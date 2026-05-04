@@ -58,6 +58,8 @@ in.dat → dyn.pl → dynamics (Fortran) → x.dat (radial structure)
 | `perl/ssd.pl` | Wrapper for the standalone thin disk spectrum executable |
 | `perl/dyntype.pl` | Manual eigenvalue inspector with gnuplot diagnostics |
 | `perl/adaf.pl` | Single-model runner with diagnostic plots |
+| `perl/lib/ADAF/Diagnostics.pm` | Solution classifier — parses output, detects sonic point, discontinuities, NaN |
+| `perl/lib/ADAF/Paths.pm` | Resolves Fortran binary paths relative to repo root |
 
 **Interpolation tables** (`aomi-*.dat`, `romi-*.dat`): Pre-computed lookup tables for inverse Compton calculations. Must be present in working directory alongside `in.dat`.
 
