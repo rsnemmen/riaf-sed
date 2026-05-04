@@ -75,7 +75,7 @@ The units of the parameters are described in the input parameter files included 
 For the usual ADAF workflow, use the one-command runner:
 
     cd /path/to/model-run
-    perl /path/to/repo/perl/run_model.pl model.dat
+    /path/to/repo/perl/run_model.pl model.dat
 
 It computes the dynamics, checks that the solution is physical, computes the spectrum, and writes a SED plot named after the parameter file basename, such as `model.png`, in the current working directory.
 
@@ -147,7 +147,7 @@ You are morally obligated to cite the following papers in any scientific literat
 
 # References
 
-General, succint description of SED models: [Nemmen et al. (2014)](http://mnras.oxfordjournals.org/content/438/4/2804)
+General, succinct description of SED models: [Nemmen et al. (2014)](http://mnras.oxfordjournals.org/content/438/4/2804)
 
 Broad review about theory and application of RIAFs: [Yuan & Narayan (2014)](https://www.annualreviews.org/doi/10.1146/annurev-astro-082812-141003) 
 
@@ -159,16 +159,6 @@ Boundary conditions: Appendix A of [Nemmen's PhD thesis](http://hdl.handle.net/1
 
 # TODO 
 
-By order of priority:
-
-- [ ] include general-purpose user scripts for plotting SEDs
-- [ ] port the core fortran code to C and better organize it
+- [x] include general-purpose user scripts for plotting SEDs
 - [ ] add nonthermal emission
-- [ ] OpenACC version for radiative transfer
-- [ ] parallelize shooting method in `dyn.pl`
-
-
----
-
-Copyright (c) 2024, [Rodrigo Nemmen](https://rodrigonemmen.com), [Feng Yuan](https://scholar.google.com/citations?user=eGeeIDAAAAAJ).
-[All rights reserved](http://opensource.org/licenses/BSD-2-Clause).
+- [ ] improve parallelization, radiative transfer
