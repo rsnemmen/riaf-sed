@@ -27,6 +27,11 @@
 /fortran/hot*.dat
 
 # Working-directory outputs from Perl wrappers
+/perl/aomi*.dat
+/perl/aomi2*.dat
+/perl/romi*.dat
+/perl/tmp.pl
+/perl/*.gp
 /perl/in.dat
 /perl/out
 /perl/out.dat
