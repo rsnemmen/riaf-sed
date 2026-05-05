@@ -28,6 +28,12 @@ romi*.dat
 /fortran/x.dat
 /fortran/hot*.dat
 
+# Working-directory outputs when running from repo root
+/out
+/spectrum
+/spectrum_
+/.matplotlib/
+
 # Working-directory outputs from Perl wrappers
 /perl/tmp.pl
 /perl/*.gp
