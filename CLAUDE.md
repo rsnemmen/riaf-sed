@@ -56,8 +56,8 @@ in.dat or model.dat → dyn.pl → dynamics (Fortran) → x.dat (radial structur
 | `perl/dyn.pl` | Eigenvalue solver — searches `sl0` range, detects physical solutions automatically |
 | `perl/spectrum.pl` | Wrapper; generates two outputs (with/without Compton) |
 | `perl/ssd.pl` | Wrapper for the standalone thin disk spectrum executable |
-| `perl/dyntype.pl` | Manual eigenvalue inspector with gnuplot diagnostics |
-| `perl/adaf.pl` | Single-model runner with diagnostic plots |
+| `perl/dyntype.pl` | **Debug only** — interactive eigenvalue inspector; prompts for eigenvalues one at a time and plots v_R/c_s + derivatives via gnuplot. Requires updating the hard-coded binary path before use. |
+| `perl/adaf.pl` | **Debug only** — single-shot manual runner with hard-coded parameters and gnuplot inspection of v_R/c_s. Requires updating the hard-coded binary path before use. |
 | `perl/lib/ADAF/Diagnostics.pm` | Solution classifier — parses output, detects sonic point, discontinuities, NaN |
 | `perl/lib/ADAF/Paths.pm` | Resolves Fortran binary paths (`bin/`) and stages data files from `data/` |
 
