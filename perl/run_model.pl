@@ -11,6 +11,7 @@ use Term::ANSIColor qw(colored);
 
 use lib "$Bin/lib";
 use ADAF::Diagnostics qw(classify_solution);
+use ADAF::Parameters qw(read_parameter);
 
 usage() if @ARGV != 1;
 
@@ -30,8 +31,8 @@ my $diag = read_parameter($input, 'diag');
 my $spectrum = read_parameter($input, 'spec');
 my $png = output_png_for($input);
 
-die colored("error", "red") . ": missing diag= in $input\n" unless defined $diag;
-die colored("error", "red") . ": missing spec= in $input\n" unless defined $spectrum;
+die colored("error", "red") . ": missing [runtime].diag in $input\n" unless defined $diag;
+die colored("error", "red") . ": missing [spectrum].filename in $input\n" unless defined $spectrum;
 
 print_stage("ADAF model run");
 print_info("Parameter file", $input);
@@ -70,32 +71,6 @@ print_info("SED plot", $png_path);
 
 sub usage {
     die "Usage: $0 parameter-file\n";
-}
-
-sub read_parameter {
-    my ($path, $key) = @_;
-
-    open(my $fh, '<', $path) or die "Can't open $path: $!\n";
-    while (my $line = <$fh>) {
-        $line =~ s/#.*$//;
-        next if $line =~ /^\s*$/;
-        my ($name, $value) = split /=/, $line, 2;
-        next unless defined $name && defined $value;
-        trim($name);
-        trim($value);
-        if ($name eq $key) {
-            close($fh);
-            return $value;
-        }
-    }
-    close($fh);
-
-    return undef;
-}
-
-sub trim {
-    $_[0] =~ s/^\s+//;
-    $_[0] =~ s/\s+$//;
 }
 
 sub output_png_for {

@@ -1,0 +1,27 @@
+[dynamics]
+gamma = 1.5
+mass = 1.6e2
+beta = 0.9
+alpha = 0.3
+delta = 0.1
+mdot_out = 3.1e-4
+r_out = 5.0e2
+p_wind = 0.3
+
+[shooting]
+sl0_initial = 2.0
+sl0_final = 3.0
+n_models = 10
+
+[boundary]
+ti = 0.2
+te = 0.19
+mach = 0.2
+
+[runtime]
+diag = "out"
+
+[spectrum]
+distance_pc = 14.5e6
+theta_deg = 30.0
+filename = "spectrum"

@@ -79,7 +79,7 @@ def main() -> int:
         axis.set_visible(False)
 
     axes_list[0].legend(loc="best", fontsize="small")
-    fig.suptitle("ADAF dynamics radial profiles: examples/largeR.dat", fontsize=14)
+    fig.suptitle("ADAF dynamics radial profiles: examples/largeR.toml", fontsize=14)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     fig.savefig(args.output, dpi=160)
     plt.close(fig)

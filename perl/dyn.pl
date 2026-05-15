@@ -35,6 +35,7 @@ use Storable qw(retrieve store);
 use Symbol qw(gensym);
 use Math::Derivative qw(Derivative1 Derivative2); 
 use ADAF::Diagnostics qw(classify_solution);
+use ADAF::Parameters qw(read_parameters);
 use ADAF::Paths qw(fortran_binary parameter_file_from_args);
 
 # Module needed to benchmark the execution time of the code
@@ -45,7 +46,26 @@ $bench0 = new Benchmark;
 $input=parameter_file_from_args($0, @ARGV);
 
 # Gets values of parameters from external parameter file
-&readParam;
+my $params = read_parameters($input);
+$gamai = $params->{gamai};
+$m = $params->{m};
+$beta = $params->{beta};
+$alfa = $params->{alfa};
+$delta = $params->{delta};
+$dotm0 = $params->{dotm0};
+$rout = $params->{rout};
+$pp0 = $params->{pp0};
+$sl0i = $params->{sl0i};
+$sl0f = $params->{sl0f};
+$nmodels = $params->{nmodels};
+$search_method = $params->{search_method};
+$eig_tol = $params->{eig_tol};
+$dyn_timeout = $params->{dyn_timeout};
+$max_workers = $params->{max_workers};
+$ti = $params->{ti};
+$te = $params->{te};
+$vcs = $params->{vcs};
+$diag = $params->{diag};
 
 # Path to ADAF dynamics executable
 $dynbinary=fortran_binary($Bin, "dynamics");
@@ -749,49 +769,6 @@ $te=$te*$tvir . "d0";
 
 
 
-
-
-
-
-
-# Subroutine that reads a file containing the model parameters. Gets the
-# values of the parameters from this file.
-sub readParam {
-
-open (PARFILE, $input) || 
-  die "Can't open $input: $!\n";
-
-# The field separator is "=". It is important that the input values in the
-# parameter file are in the strict format "var=value" (no quotes).
-while (<PARFILE>) {
-  if ($_ !~ /#/  && $_ ne " ") {
-      @fields=split /=/, $_;
-      chomp @fields;
-
-      if ($fields[0] =~ /^gamai$/) {$gamai=$fields[1];}
-      if ($fields[0] =~ /^m$/) {$m=$fields[1];}
-      if ($fields[0] =~ /^beta$/) {$beta=$fields[1];}
-      if ($fields[0] =~ /^alfa$/) {$alfa=$fields[1];}
-      if ($fields[0] =~ /^delta$/) {$delta=$fields[1];}
-      if ($fields[0] =~ /^dotm0$/) {$dotm0=$fields[1];}
-      if ($fields[0] =~ /^rout$/) {$rout=$fields[1];}
-      if ($fields[0] =~ /^pp0$/) {$pp0=$fields[1];}
-      if ($fields[0] =~ /^sl0i$/) {$sl0i=$fields[1];}
-      if ($fields[0] =~ /^sl0f$/) {$sl0f=$fields[1];}
-      if ($fields[0] =~ /^nmodels$/) {$nmodels=$fields[1];}
-      if ($fields[0] =~ /^search_method$/) {$search_method=$fields[1];}
-      if ($fields[0] =~ /^eig_tol$/) {$eig_tol=$fields[1];}
-      if ($fields[0] =~ /^dyn_timeout$/) {$dyn_timeout=$fields[1];}
-      if ($fields[0] =~ /^max_workers$/) {$max_workers=$fields[1];}
-      if ($fields[0] =~ /^ti$/) {$ti=$fields[1];}
-      if ($fields[0] =~ /^te$/) {$te=$fields[1];}
-      if ($fields[0] =~ /^vcs$/) {$vcs=$fields[1];}
-      if ($fields[0] =~ /^diag$/) {$diag=$fields[1];}
-  }  
-}
-
-close PARFILE;
-}
 
 
 

@@ -16,7 +16,7 @@ sub parameter_file_from_args {
     $script_name = 'script' unless defined $script_name && length $script_name;
     die "Usage: $script_name [parameter-file]\n" if @args > 1;
 
-    return @args ? $args[0] : 'in.dat';
+    return @args ? $args[0] : 'in.toml';
 }
 
 sub fortran_binary {

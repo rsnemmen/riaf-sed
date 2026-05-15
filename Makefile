@@ -9,8 +9,9 @@ clean:
 clean-data:
 	find . -type f -name '*.dat' \
 		! -path './data/*' \
-		! -path './examples/*' \
-		! -path './tests/testcases_for_code/*' \
+			! -path './examples/*' \
+			! -path './tests/fixtures/*' \
+			! -path './tests/testcases_for_code/*' \
 		! -path './tests/templates/*' \
 		! -path './tests/n1097/older/*' \
 		! -path './fortran/hot.dat' \

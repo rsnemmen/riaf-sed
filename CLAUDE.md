@@ -24,14 +24,14 @@ The top-level `Makefile` delegates to `fortran/Makefile`, which outputs binaries
 
 ## Typical Workflow
 
-All runs happen in a working directory containing a parameter file. With no argument, the main wrappers read `in.dat`; they can also take one positional parameter file such as `model.dat`. Build the Fortran binaries first with `make build`; the Perl wrappers resolve binaries from `bin/` and automatically symlink the IC lookup tables from `data/` into the working directory — no manual copying required.
+All runs happen in a working directory containing a TOML parameter file. With no argument, the main wrappers read `in.toml`; they can also take one positional parameter file such as `model.toml`. Build the Fortran binaries first with `make build`; the Perl wrappers resolve binaries from `bin/` and automatically symlink the IC lookup tables from `data/` into the working directory — no manual copying required.
 
-1. Edit `in.dat` with model parameters, or prepare `model.dat`
-2. Find physical global solution: `perl /path/to/perl/dyn.pl` or `perl /path/to/perl/dyn.pl model.dat`
-3. Compute SED: `perl /path/to/perl/spectrum.pl` or `perl /path/to/perl/spectrum.pl model.dat`
-4. Optional thin disk SED: `perl /path/to/perl/ssd.pl` or `perl /path/to/perl/ssd.pl model.dat`
+1. Edit `in.toml` with model parameters, or prepare `model.toml`
+2. Find physical global solution: `perl /path/to/perl/dyn.pl` or `perl /path/to/perl/dyn.pl model.toml`
+3. Compute SED: `perl /path/to/perl/spectrum.pl` or `perl /path/to/perl/spectrum.pl model.toml`
+4. Optional thin disk SED: `perl /path/to/perl/ssd.pl` or `perl /path/to/perl/ssd.pl model.toml`
 
-Use `examples/largeR.dat` or `examples/smallR.dat` as templates, either copied to `in.dat` or passed explicitly.
+Use `examples/largeR.toml` or `examples/smallR.toml` as templates, either copied to `in.toml` or passed explicitly.
 
 ## Architecture
 
@@ -39,7 +39,7 @@ The code uses a shooting method (boundary value problem) to find the global dyna
 
 **Data flow:**
 ```
-in.dat or model.dat → dyn.pl → dynamics (Fortran) → x.dat (radial structure)
+in.toml or model.toml → dyn.pl → dynamics (Fortran) → x.dat (radial structure)
                                                         ↓
                                        spectrum.pl → spectrum (Fortran) → spectrum.dat
                                        ssd.pl      → ssd_alone (Fortran) → *_ssd
@@ -63,22 +63,22 @@ in.dat or model.dat → dyn.pl → dynamics (Fortran) → x.dat (radial structur
 
 **Interpolation tables** (`data/aomi-*.dat`, `data/romi-*.dat`): Pre-computed lookup tables for inverse Compton calculations. Canonical copies live in `data/`; `spectrum.pl` symlinks them into the working directory automatically.
 
-## Key Parameters (`in.dat`)
+## Key Parameters (`in.toml`)
 
 | Parameter | Description |
 |-----------|-------------|
-| `gamma` | Adiabatic index |
-| `m` | Black hole mass (units of 10^6 M_sun) |
-| `beta` | Gas/total pressure ratio |
-| `alfa` | Shakura-Sunyaev viscosity α |
-| `delta` | Fraction of turbulent dissipation heating electrons |
-| `mdot` | Accretion rate at outer radius (Eddington units) |
-| `rout` | Outer radius (Schwarzschild radii) |
-| `pp0` | Outflow strength (`s` parameter) |
-| `ti`, `te` | Outer boundary temperatures for ions/electrons (K) |
-| `vcs` | v_R/c_s ratio at outer boundary |
-| `sl0i`, `sl0f` | Eigenvalue search range |
-| `nmodels` | Number of eigenvalue samples |
+| `dynamics.gamma` | Adiabatic index |
+| `dynamics.mass` | Black hole mass (units of 10^6 M_sun) |
+| `dynamics.beta` | Gas/total pressure ratio |
+| `dynamics.alpha` | Shakura-Sunyaev viscosity α |
+| `dynamics.delta` | Fraction of turbulent dissipation heating electrons |
+| `dynamics.mdot_out` | Accretion rate at outer radius (Eddington units) |
+| `dynamics.r_out` | Outer radius (Schwarzschild radii) |
+| `dynamics.p_wind` | Outflow strength (`s` parameter) |
+| `boundary.ti`, `boundary.te` | Outer boundary temperatures for ions/electrons |
+| `boundary.mach` | v_R/c_s ratio at outer boundary |
+| `shooting.sl0_initial`, `shooting.sl0_final` | Eigenvalue search range |
+| `shooting.n_models` | Number of eigenvalue samples |
 
 ## Finding Physical Solutions
 
@@ -101,7 +101,7 @@ If many `NaN`/`FAILED!` results appear, try slightly adjusting boundary conditio
 
 ## Parallelization Strategy
 
-For parameter space exploration, use "dumb parallelization": create separate run directories (`run01/`, `run02/`, etc.), each with its own `in.dat` or custom parameter file, and run `dyn.pl` simultaneously in separate terminal tabs.
+For parameter space exploration, use "dumb parallelization": create separate run directories (`run01/`, `run02/`, etc.), each with its own `in.toml` or custom parameter file, and run `dyn.pl` simultaneously in separate terminal tabs.
 
 ## Dependencies
 
@@ -121,9 +121,9 @@ Install Perl modules: `sudo cpan Math::Derivative && sudo cpan Chart::Gnuplot`
 
 `tests/n1097/` and `tests/m81/` contain complete example model runs.
 
-`tests/reference/largeR_dyn.out` is the fiducial dynamics profile generated from `examples/largeR.dat`. `tests/compare_dynamics.py` compares all 15 radial-profile columns, including Mach number and `log(rho)`. `tests/plot_dynamics.py` writes a gridded inspection plot to `tests/artifacts/largeR_dynamics.png`.
+`tests/reference/largeR_dyn.out` is the fiducial dynamics profile generated from `examples/largeR.toml`. `tests/compare_dynamics.py` compares all 15 radial-profile columns, including Mach number and `log(rho)`. `tests/plot_dynamics.py` writes a gridded inspection plot to `tests/artifacts/largeR_dynamics.png`.
 
-`tests/reference/largeR_spectrum.out` is the fiducial spectrum generated by running `perl/dyn.pl examples/largeR.dat` followed by `perl/spectrum.pl examples/largeR.dat` in the same working directory. `tests/compare_spectrum.py` compares the log-frequency grid and `log10(nu Lnu)` values with tight log-space tolerances. `tests/plot_spectrum.py` writes `tests/artifacts/largeR_spectrum.png`, with the spectrum overlay on top and a residual panel below.
+`tests/reference/largeR_spectrum.out` is the fiducial spectrum generated by running `perl/dyn.pl examples/largeR.toml` followed by `perl/spectrum.pl examples/largeR.toml` in the same working directory. `tests/compare_spectrum.py` compares the log-frequency grid and `log10(nu Lnu)` values with tight log-space tolerances. `tests/plot_spectrum.py` writes `tests/artifacts/largeR_spectrum.png`, with the spectrum overlay on top and a residual panel below.
 
 Run the lightweight smoke/regression checks with `make smoke`. This rebuilds the Fortran binaries, checks representative good/bad dynamical fixtures, validates bundled example spectra, runs the `largeR` dynamics and spectrum workflow, compares both outputs with their fiducial solutions, and refreshes the dynamics and spectrum plot artifacts.
 

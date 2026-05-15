@@ -9,6 +9,7 @@
 use FindBin qw($Bin);
 use lib "$Bin/lib";
 use Math::Derivative qw(Derivative1 Derivative2);
+use ADAF::Parameters qw(read_parameters);
 use ADAF::Paths qw(fortran_binary parameter_file_from_args stage_data_files);
 use Cwd qw(getcwd);
 use IPC::Open3;
@@ -29,7 +30,14 @@ use File::Copy;
 $input=parameter_file_from_args($0, @ARGV);
 
 # Gets values of parameters from external parameter file
-&readParam;
+my $params = read_parameters($input);
+$distance = $params->{distance};
+$m = $params->{m};
+$beta = $params->{beta};
+$alfa = $params->{alfa};
+$dotm0 = $params->{dotm0};
+$rout = $params->{rout};
+$outfile = $params->{spec};
 
 # Path to ADAF spectrum executable
 $specbin=fortran_binary($Bin, "spectrum");
@@ -230,42 +238,6 @@ sub runSpectrumPass {
    die "$specbin failed during $stage spectrum generation.\n"
       if $exit_status != 0;
 }
-
-# Subroutine that reads a file containing the model parameters. Gets the
-# values of the parameters from this file.
-sub readParam {
-
-open (PARFILE, $input) || 
-	die "Can't open $input: $!\n";
-
-# The field separator is "=". It is important that the input values in the
-# parameter file are in the strict format "var=value" (no quotes).
-while (<PARFILE>) {
-  if ($_ !~ /#/  && $_ ne " ") {
-      @fields=split /=/, $_;
-      chomp @fields;
-
-      if ($fields[0] =~ /^distance$/) {$distance=$fields[1];}
-      if ($fields[0] =~ /^m$/) {$m=$fields[1];}
-      if ($fields[0] =~ /^beta$/) {$beta=$fields[1];}
-      if ($fields[0] =~ /^alfa$/) {$alfa=$fields[1];}
-#      if ($fields[0] =~ /^y1$/) {$y1=$fields[1];}
-      if ($fields[0] =~ /^dotm0$/) {$dotm0=$fields[1];}
-      if ($fields[0] =~ /^rout$/) {$rout=$fields[1];}
-#      if ($fields[0] =~ /^y2$/) {$y2=$fields[1];}
-#      if ($fields[0] =~ /^qbreset$/) {$qbreset=$fields[1];}
-#      if ($fields[0] =~ /^compton$/) {$compton=$fields[1];}
-#      if ($fields[0] =~ /^nlines$/) {$nlines=$fields[1];}
-      if ($fields[0] =~ /^spec$/) {$outfile=$fields[1];}
-  }  
-}
-
-close PARFILE;
-}
-
-
-
-
 
 
 # Generates spectra without Comptonization and calculates the range

@@ -13,7 +13,7 @@ Figure: The dashed line corresponds to the SED calculated for the RIAF around th
 # Requirements
 
 - Fortran compiler (e.g., gfortran) with OpenMP support
-- Perl with modules `Math::Derivative`, `Chart::Gnuplot`
+- Perl with modules `Math::Derivative`, `Chart::Gnuplot`, `TOML::Tiny`
 - Python 3 with Matplotlib for the smoke/regression comparison checks and diagnostic plots
 
 To install the required Perl modules use the commands:
@@ -22,6 +22,7 @@ To install the required Perl modules use the commands:
 cpan App::cpanminus
 sudo cpan Math::Derivative
 sudo cpan Chart::Gnuplot
+sudo cpan TOML::Tiny
 ```
 
 # Installation
@@ -69,7 +70,7 @@ The units of the parameters are described in the input parameter files included 
 
 1. Build the Fortran binaries with `make build`
 2. `cd` to the directory that will contain the SED
-3. Prepare the parameter file `model.dat` (you can start from the one in `examples/largeR.dat`)
+3. Prepare the parameter file `model.toml` (you can start from the one in `examples/largeR.toml`)
 4. Run the Perl wrappers directly from this repository; `perl/run_model.pl` (or `perl/dyn.pl`, `perl/spectrum.pl` and `perl/ssd.pl`)
 
 ## Compute SED
@@ -78,10 +79,10 @@ For the usual workflow, use the one-command runner:
 
 ```shell
 cd /path/model-run
-/path/perl/run_model.pl model.dat
+/path/perl/run_model.pl model.toml
 ``` 
 
-This will compute the dynamics, checks that the solution is physical, compute the spectrum, and write a SED plot named after the parameter file basename, such as `model.png`, in the current working directory.
+This will compute the dynamics, check that the solution is physical, compute the spectrum, and write a SED plot named after the parameter file basename, such as `model.png`, in the current working directory.
 
 ### Manual runs
 
@@ -93,12 +94,12 @@ You can pass a parameter file explicitly:
 
 ```shell
 cd /path/model-run
-perl /path/perl/dyn.pl model.dat
-perl /path/perl/spectrum.pl model.dat
-perl /path/perl/ssd.pl model.dat
+perl /path/perl/dyn.pl model.toml
+perl /path/perl/spectrum.pl model.toml
+perl /path/perl/ssd.pl model.toml
 ```
 
-With no parameter-file argument, the scripts read `in.dat` from the working directory.
+With no parameter-file argument, the scripts read `in.toml` from the working directory.
 
 The scripts above are meant to be invoked from the working directory that contains the selected parameter file and, for `spectrum.pl`, the matching `x.dat` produced by `dyn.pl`.
 
@@ -106,10 +107,16 @@ The scripts above are meant to be invoked from the working directory that contai
 
 Two examples of input parameter files are included in the `examples` folder:
 
-- `largeR.dat`: ADAF with *R_out=1E4 Rs*
-- `smallR.dat`: *R_out=500 Rs*
+- `largeR.toml`: ADAF with *R_out=1E4 Rs*
+- `smallR.toml`: *R_out=500 Rs*
 
-In order to compute the corresponding models, either copy one to `in.dat` or pass the file explicitly, for example `perl perl/run_model.pl examples/largeR.dat`.
+In order to compute the corresponding models, either copy one to `in.toml` or pass the file explicitly, for example `perl perl/run_model.pl examples/largeR.toml`.
+
+To convert an old legacy `key=value` parameter file, run:
+
+```shell
+perl perl/convert_params.pl old_model.dat model.toml
+```
 
 For more information and useful references, refer to [this document](./docs/advice.md). 
 
@@ -119,7 +126,7 @@ Test suite can be run with:
 
     make smoke
 
-This command rebuilds the Fortran binaries, checks representative "nice" and "bad" dynamical solutions from `tests/testcases_for_code/`, verifies the bundled `tests/n1097/` and `tests/m81/` example outputs are still parseable and physically plausible, and runs the `examples/largeR.dat` dynamics and spectrum workflow. It compares all 15 radial-profile columns against `tests/reference/largeR_dyn.out`, compares the generated spectrum against `tests/reference/largeR_spectrum.out`, and writes diagnostic plots to `tests/artifacts/largeR_dynamics.png` and `tests/artifacts/largeR_spectrum.png`.
+This command rebuilds the Fortran binaries, checks representative "nice" and "bad" dynamical solutions from `tests/testcases_for_code/`, verifies the bundled `tests/n1097/` and `tests/m81/` example outputs are still parseable and physically plausible, and runs the `examples/largeR.toml` dynamics and spectrum workflow. It compares all 15 radial-profile columns against `tests/reference/largeR_dyn.out`, compares the generated spectrum against `tests/reference/largeR_spectrum.out`, and writes diagnostic plots to `tests/artifacts/largeR_dynamics.png` and `tests/artifacts/largeR_spectrum.png`.
 
 
 # Citation

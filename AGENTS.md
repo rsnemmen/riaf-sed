@@ -7,7 +7,7 @@ This repository computes ADAF/RIAF dynamics and spectra using Fortran solvers wi
 - `fortran/`: numerical solvers. `dynamics.f` computes radial flow structure; `spectrum.f` computes emission; `ssd_new.f` and `ssd_alone.f` handle thin-disk spectra.
 - `perl/`: user-facing wrappers and workflow scripts. Shared Perl modules live in `perl/lib/ADAF/`.
 - `data/`: canonical inverse-Compton lookup tables staged automatically by `spectrum.pl`.
-- `examples/`: tracked parameter files, including `largeR.dat` and `smallR.dat`.
+- `examples/`: tracked TOML parameter files, including `largeR.toml` and `smallR.toml`.
 - `tests/`: smoke tests, reference dynamics/spectrum outputs, saved example outputs, and comparison utilities.
 - `bin/`: generated Fortran binaries from `make build`; do not commit generated binaries.
 
@@ -17,9 +17,9 @@ This repository computes ADAF/RIAF dynamics and spectra using Fortran solvers wi
 - `make smoke`: build binaries and run smoke/regression checks, including the `largeR` dynamics/spectrum comparisons and plot artifacts.
 - `make clean`: remove compiled binaries and Fortran build artifacts.
 - `make clean-data`: remove top-level generated data products from test/model runs.
-- Example run: `perl perl/dyn.pl examples/largeR.dat`.
+- Example run: `perl perl/dyn.pl examples/largeR.toml`.
 
-Run Perl wrappers from a model working directory when using local `in.dat`; otherwise pass an explicit parameter file path.
+Run Perl wrappers from a model working directory when using local `in.toml`; otherwise pass an explicit parameter file path.
 
 ## Coding Style & Naming Conventions
 
@@ -29,7 +29,7 @@ Use descriptive filenames matching existing patterns: `out_*` for dynamics outpu
 
 ## Testing Guidelines
 
-The primary test entry point is `make smoke`. It validates good/bad dynamics fixtures, bundled example spectra, compares `perl/dyn.pl examples/largeR.dat` against `tests/reference/largeR_dyn.out` using `tests/compare_dynamics.py`, and compares the corresponding `perl/spectrum.pl examples/largeR.dat` output against `tests/reference/largeR_spectrum.out` using `tests/compare_spectrum.py`. It writes `tests/artifacts/largeR_dynamics.png` and `tests/artifacts/largeR_spectrum.png` for inspection.
+The primary test entry point is `make smoke`. It validates good/bad dynamics fixtures, bundled example spectra, compares `perl/dyn.pl examples/largeR.toml` against `tests/reference/largeR_dyn.out` using `tests/compare_dynamics.py`, and compares the corresponding `perl/spectrum.pl examples/largeR.toml` output against `tests/reference/largeR_spectrum.out` using `tests/compare_spectrum.py`. It writes `tests/artifacts/largeR_dynamics.png` and `tests/artifacts/largeR_spectrum.png` for inspection.
 
 When changing dynamics or spectral behavior, regenerate fiducials only if the numerical change is intentional and scientifically reviewed. Preserve diagnostic failures that catch nonphysical solutions.
 
@@ -41,4 +41,4 @@ Pull requests should describe the scientific or workflow motivation, list comman
 
 ## Configuration Notes
 
-Required tools are `gfortran`, Perl modules `Math::Derivative` and `Chart::Gnuplot`, and Python 3 with Matplotlib. Gnuplot is optional for diagnostic plotting.
+Required tools are `gfortran`, Perl modules `Math::Derivative`, `Chart::Gnuplot`, and `TOML::Tiny`, and Python 3 with Matplotlib. Gnuplot is optional for diagnostic plotting.

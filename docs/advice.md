@@ -2,7 +2,7 @@
 
 If you are having trouble finding a global solution, try playing around with `dyntype.pl`. Instead of trying to find automatically the "shooting value" or eigenvalue of the boundary value problem, you input eigenvalues manually and inspect the resulting plots radius vs radial velocity.
 
-If you want to inspect the behaviour of the dynamical solution,  have a look at the log file `out` which you define in the 38th line of `in.dat`. Every line corresponds to a different cylindrical radius shell of the RIAF, with the first column listing the radius (in units of M) and the others giving physical quantities.
+If you want to inspect the behaviour of the dynamical solution, have a look at the log file `out` defined by `runtime.diag` in `in.toml`. Every line corresponds to a different cylindrical radius shell of the RIAF, with the first column listing the radius (in units of M) and the others giving physical quantities.
 
 The eigenvalue parameter is usually between 1 and 3
  
@@ -25,7 +25,7 @@ Please refer to the Appendix A of my [PhD thesis](http://hdl.handle.net/10183/16
 
 ## Doing many model realizations "in parallel"
 
-If you are fitting a SED, you need to explore many models and combinations of parameters. Unfortunately, we do not have yet any MCMC fitting that does this automatically for you. Here is how I usually run the ADAF models in parallel ("dumb parallelization"). I created three folders inside `adaf_code/perl` named `run01`, `run02` and `run03`. Inside each of these folders there is a parameter file `in.dat`. 
+If you are fitting a SED, you need to explore many models and combinations of parameters. Unfortunately, we do not have yet any MCMC fitting that does this automatically for you. Here is how I usually run the ADAF models in parallel ("dumb parallelization"). I created three folders inside `adaf_code/perl` named `run01`, `run02` and `run03`. Inside each of these folders there is a parameter file `in.toml`.
 
 I open one terminal with three tabs corresponding to each folder (or three terminals). Then I edit the three input files corresponding to a set of models, and finally run the program at the same time in each terminal. Hence why "dumb parallelization".
 

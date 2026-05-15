@@ -6,6 +6,7 @@
 
 use FindBin qw($Bin);
 use lib "$Bin/lib";
+use ADAF::Parameters qw(read_parameters);
 use ADAF::Paths qw(fortran_binary parameter_file_from_args);
 
 # Needed so that I can plot with Gnuplot
@@ -22,7 +23,13 @@ use File::Copy;
 $input=parameter_file_from_args($0, @ARGV);
 
 # Gets values of parameters from external parameter file
-&readParam;
+my $params = read_parameters($input);
+$distance = $params->{distance};
+$m = $params->{m};
+$dotm0 = $params->{dotm0};
+$rin = $params->{rout};
+$theta = $params->{theta};
+$outfile = $params->{spec};
 
 # Path to ADAF spectrum executable
 $specbin=fortran_binary($Bin, "ssd_alone");
@@ -64,35 +71,3 @@ sub convDbl {
 
 
 
-
-
-
-
-
-
-
-# Subroutine that reads a file containing the model parameters. Gets the
-# values of the parameters from this file.
-sub readParam {
-
-open (PARFILE, $input) || 
-	die "Can't open $input: $!\n";
-
-# The field separator is "=". It is important that the input values in the
-# parameter file are in the strict format "var=value" (no quotes).
-while (<PARFILE>) {
-  if ($_ !~ /#/  && $_ ne " ") {
-      @fields=split /=/, $_;
-      chomp @fields;
-
-      if ($fields[0] =~ /^distance$/) {$distance=$fields[1];}
-      if ($fields[0] =~ /^m$/) {$m=$fields[1];}
-      if ($fields[0] =~ /^dotm0$/) {$dotm0=$fields[1];}
-      if ($fields[0] =~ /^rout$/) {$rin=$fields[1];}
-      if ($fields[0] =~ /^theta$/) {$theta=$fields[1];}
-      if ($fields[0] =~ /^spec$/) {$outfile=$fields[1];}
-  }  
-}
-
-close PARFILE;
-}

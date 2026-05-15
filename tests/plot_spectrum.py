@@ -45,7 +45,7 @@ def main() -> int:
     plot_residuals(residual_axis, reference, candidate)
 
     axis.set_ylabel(r"$\log_{10}(\nu L_\nu / \mathrm{erg}\ \mathrm{s}^{-1})$")
-    axis.set_title("ADAF spectrum: examples/largeR.dat")
+    axis.set_title("ADAF spectrum: examples/largeR.toml")
     axis.grid(True, alpha=0.25)
     axis.legend(loc="best")
     axis.tick_params(labelbottom=False)

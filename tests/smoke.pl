@@ -9,12 +9,15 @@ use File::Temp qw(tempdir);
 use FindBin qw($Bin);
 use lib File::Spec->catdir($Bin, File::Spec->updir(), 'perl', 'lib');
 use ADAF::Diagnostics qw(classify_solution);
+use ADAF::Parameters qw(read_parameters);
 use ADAF::Paths qw(parameter_file_from_args);
 
 my $repo_root = abs_path(File::Spec->catdir($Bin, File::Spec->updir()));
 my $fortran_dir = File::Spec->catdir($repo_root, 'fortran');
 
 test_parameter_file_selector();
+test_parameter_parser();
+test_legacy_converter();
 
 run_command('make', '-C', $fortran_dir);
 
@@ -75,7 +78,7 @@ sub run_command {
 sub test_largeR_dynamics_regression {
     my $workdir = tempdir('adaf-dyn-XXXX', TMPDIR => 1, CLEANUP => 1);
     my $dyn_script = File::Spec->catfile($repo_root, 'perl', 'dyn.pl');
-    my $input = File::Spec->catfile($repo_root, 'examples', 'largeR.dat');
+    my $input = File::Spec->catfile($repo_root, 'examples', 'largeR.toml');
     my $candidate = File::Spec->catfile($workdir, 'out');
     my $reference = File::Spec->catfile($repo_root, 'tests', 'reference', 'largeR_dyn.out');
     my $comparator = File::Spec->catfile($repo_root, 'tests', 'compare_dynamics.py');
@@ -95,7 +98,7 @@ sub test_largeR_dynamics_regression {
 sub test_largeR_spectrum_regression {
     my $workdir = tempdir('adaf-spectrum-XXXX', TMPDIR => 1, CLEANUP => 1);
     my $runner = File::Spec->catfile($repo_root, 'perl', 'run_model.pl');
-    my $input = File::Spec->catfile($repo_root, 'examples', 'largeR.dat');
+    my $input = File::Spec->catfile($repo_root, 'examples', 'largeR.toml');
     my $dynamics_candidate = File::Spec->catfile($workdir, 'out');
     my $candidate = File::Spec->catfile($workdir, 'spectrum');
     my $reference = File::Spec->catfile($repo_root, 'tests', 'reference', 'largeR_spectrum.out');
@@ -131,16 +134,45 @@ sub run_command_in_dir {
 
 sub test_parameter_file_selector {
     my $default = parameter_file_from_args('dyn.pl');
-    die "No-argument parameter selection should use in.dat.\n" unless $default eq 'in.dat';
+    die "No-argument parameter selection should use in.toml.\n" unless $default eq 'in.toml';
 
-    my $custom = parameter_file_from_args('dyn.pl', 'model.dat');
-    die "One-argument parameter selection should use that file.\n" unless $custom eq 'model.dat';
+    my $custom = parameter_file_from_args('dyn.pl', 'model.toml');
+    die "One-argument parameter selection should use that file.\n" unless $custom eq 'model.toml';
 
     my $error;
-    eval { parameter_file_from_args('dyn.pl', 'model.dat', 'extra.dat'); };
+    eval { parameter_file_from_args('dyn.pl', 'model.toml', 'extra.toml'); };
     $error = $@;
     die "Multiple parameter arguments should fail with usage.\n"
         unless $error =~ /^Usage: dyn\.pl \[parameter-file\]/;
+}
+
+sub test_parameter_parser {
+    my $input = File::Spec->catfile($repo_root, 'examples', 'largeR.toml');
+    my $params = read_parameters($input);
+
+    die "TOML gamma should map to gamai.\n" unless nearly_equal($params->{gamai}, 1.5);
+    die "TOML spectrum filename should map to spec.\n" unless $params->{spec} eq 'spectrum';
+    die "TOML boundary Mach number should map to vcs.\n" unless nearly_equal($params->{vcs}, 0.2);
+}
+
+sub test_legacy_converter {
+    my $workdir = tempdir('adaf-convert-XXXX', TMPDIR => 1, CLEANUP => 1);
+    my $converter = File::Spec->catfile($repo_root, 'perl', 'convert_params.pl');
+    my $legacy = File::Spec->catfile($repo_root, 'tests', 'fixtures', 'legacy_largeR.dat');
+    my $output = File::Spec->catfile($workdir, 'legacy_largeR.toml');
+
+    run_command('perl', $converter, $legacy, $output);
+    my $params = read_parameters($output);
+
+    die "Converted Fortran D exponent should use TOML numeric notation.\n"
+        unless nearly_equal($params->{dotm0}, 3.1e-4);
+    die "Converted runtime diag should be preserved.\n"
+        unless $params->{diag} eq 'out';
+}
+
+sub nearly_equal {
+    my ($left, $right) = @_;
+    return abs($left - $right) < 1e-12;
 }
 
 sub validate_spectrum {
